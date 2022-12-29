@@ -1,3 +1,11 @@
 /build/
 *.iml
 .idea/
+plugin/build
+.gradle
+.idea
+api-test/build
+build
+build-logic/.gradle
+build-logic/build
+build-logic/plugins/convention/build

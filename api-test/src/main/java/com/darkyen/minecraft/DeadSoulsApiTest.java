@@ -1,5 +1,9 @@
 package com.darkyen.minecraft;
 
+import com.darkyen.minecraft.api.DeadSoulsAPI;
+import com.darkyen.minecraft.api.ISoul;
+import com.darkyen.minecraft.api.Soul;
+import com.darkyen.minecraft.api.SoulPickupEvent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
@@ -29,7 +33,7 @@ public class DeadSoulsApiTest extends JavaPlugin {
 			final DeadSoulsAPI api = DeadSoulsAPI.instance();
 
 			final Server server = getServer();
-			final ArrayList<DeadSoulsAPI.Soul> souls = new ArrayList<>();
+			final ArrayList<ISoul> souls = new ArrayList<>();
 			final Location location = new Location(null, 0, 0, 0);
 			final Location locationSoul = new Location(null, 0, 0, 0);
 			final ArrayList<ItemStack> itemPool = new ArrayList<>();
@@ -46,7 +50,7 @@ public class DeadSoulsApiTest extends JavaPlugin {
 					final UUID worldUUID = onlinePlayer.getWorld().getUID();
 					api.getSoulsByLocation(souls, worldUUID, location.getBlockX(), location.getBlockZ(), radius);
 					boolean remove = false;
-					for (DeadSoulsAPI.Soul soul : souls) {
+					for (ISoul soul : souls) {
 						if (remove) {
 							Collections.addAll(itemPool, soul.getItems());
 							xpPool[0] += soul.getExperiencePoints();
@@ -99,9 +103,9 @@ public class DeadSoulsApiTest extends JavaPlugin {
 			server.getPluginManager().registerEvents(new Listener() {
 
 				@EventHandler(ignoreCancelled = true)
-				public void onSoulPickup(DeadSoulsAPI.SoulPickupEvent event) {
+				public void onSoulPickup(SoulPickupEvent event) {
 					if (random.nextBoolean()) {
-						final DeadSoulsAPI.Soul soul = event.getSoul();
+						final ISoul soul = event.getSoul();
 						final Player player = event.getPlayer();
 
 						event.setCancelled(true);
