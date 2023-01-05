@@ -1,8 +1,18 @@
 # DeadSouls
-*Dark Souls inspired graveyard plugin*
 
-- Run `./wemi assembly` to compile
-- Plugin jar is in `/build/DeadSouls-<version>.jar`, install it appropriately. Spigot 1.14.2 or later is needed.
+We've been using [DeadSouls](https://github.com/Darkyenus/DeadSouls) on [EmpireProjekt](https://empireprojekt.ru/) for a very long time and we wan to make this plugin even better! Or at least keep it alive.
+
+I've made some changes according to [AstraTemplate](https://github.com/Astra-Interactive/AstraTemplate)
+
+Big thanks to [Original Author of the plguin](https://github.com/Darkyenus)
+
+*Dark Souls inspired graveyard plugin*
+```bash
+# Run tests
+./gradlew test
+# Build .jar; See gradle/libs.versions.toml to change destination directory
+./gradlew shadowJar
+```
 - Die (preferably only in-game)
 - Go where you died, you will find a soul with all your items and most of your XP (90% by default)
     - Soul is collected automatically by walking over it
@@ -29,8 +39,5 @@ Items collected into the soul are taken from the drop table, which is then clear
 If you want to prevent some items from dropping, remove them in a lower priority event handler.
 
 There are no other event handlers that could cause compatibility problems.
-
-The plugin provides a public stable API (since version 1.6), which can be obtained through `DeadSoulsAPI.instance()`.
-NOTE: Read the documentation for possible failure modes.
-
-To compile against this plugin, get the dependency here: [![](https://jitpack.io/v/com.darkyen/DeadSouls.svg)](https://jitpack.io/#com.darkyen/DeadSouls).
+### API - [TODO]
+Probably, you can use old DeadSouls api, which you can find on original repository
