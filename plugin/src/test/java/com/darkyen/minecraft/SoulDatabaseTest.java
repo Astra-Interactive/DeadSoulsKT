@@ -4,6 +4,7 @@ import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
 import com.darkyen.minecraft.api.ISoul;
 import com.darkyen.minecraft.api.Soul;
+import com.darkyen.minecraft.mock.ServerStub;
 import com.darkyen.minecraft.utils.channels.ByteBufferChannel;
 import com.darkyen.minecraft.utils.channels.DataInputChannel;
 import com.darkyen.minecraft.utils.channels.DataOutputChannel;
@@ -29,14 +30,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  *
  */
 public class SoulDatabaseTest {
-//	private static ServerMock server;
-//	private static DeadSouls plugin;
+	private static ServerMock server;
+	private static DeadSouls plugin;
 
     @BeforeAll
     static void setup() {
 //		server = MockBukkit.mock();
 //		plugin = MockBukkit.load(DeadSouls.class);
-//        Bukkit.setServer(server);
         Bukkit.setServer(new ServerStub() {
         });
     }
@@ -51,12 +51,12 @@ public class SoulDatabaseTest {
         final ItemStack goodItem1 = new ItemStack(Material.DIRT, 5);
         final ItemStack goodItem2 = new ItemStack(Material.COBBLESTONE, 50);
 
-        final ItemStack badItem = new ItemStack(Material.DIAMOND_SWORD, 1);// {
-//            @Override
-//            public @NotNull Map<String, Object> serialize() {
-//                throw new RuntimeException("this item is not serializable, sorry (not error)");
-//            }
-//        };
+        final ItemStack badItem = new ItemStack(Material.DIAMOND_SWORD, 1) {
+            @Override
+            public @NotNull Map<String, Object> serialize() {
+                throw new RuntimeException("this item is not serializable, sorry (not error)");
+            }
+        };
 
         final ItemStack[] brokenItems = {goodItem1, badItem, goodItem2};
         final ItemStack[] goodItems = {goodItem1, goodItem2};

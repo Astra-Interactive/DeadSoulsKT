@@ -23,7 +23,7 @@ dependencies {
     testImplementation(libs.orgTesting)
     testImplementation(libs.paperApi)
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.1")
-    testImplementation("com.github.seeseemelk:MockBukkit-v1.19:2.29.0")
+    testImplementation("com.github.MockBukkit:MockBukkit:v1.19-SNAPSHOT")
     // Spigot dependencies
     compileOnly(libs.essentialsx)
     compileOnly(libs.paperApi)

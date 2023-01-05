@@ -1,5 +1,6 @@
 package com.darkyen.minecraft.api;
 
+import com.darkyen.minecraft.DeadSouls;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -38,7 +39,7 @@ public interface DeadSoulsAPI {
 		if (plugin == null) {
 			throw new IllegalStateException("DeadSouls plugin classes are loaded, but the plugin is not");
 		}
-		return (DeadSoulsAPI) plugin;
+		return ((DeadSouls) plugin).api;
 	}
 
 	/** Get all souls which exist.

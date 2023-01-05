@@ -174,7 +174,6 @@ class ItemStoreTest {
                 }
             } catch (Throwable t) {
                 System.out.println("Failed: "+item.getType());
-                t.printStackTrace();
             }
         }
 

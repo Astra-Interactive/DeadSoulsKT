@@ -76,7 +76,7 @@ public final class SoulDatabase {
 
     /** NOTE: Synchronize on the collection before accessing */
     @NotNull
-    ArrayList<@Nullable Soul> getSoulsById() {
+    public ArrayList<@Nullable Soul> getSoulsById() {
 	    return soulsById;
     }
 
@@ -397,7 +397,6 @@ public final class SoulDatabase {
             LOG.log(Level.SEVERE, "Failed to serialize: "+ Arrays.toString(items), io);
             return false;
         }
-
         return true;
     }
 
