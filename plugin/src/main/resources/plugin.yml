@@ -1,8 +1,11 @@
-name: DeadSouls
-version: '1.7'
-api-version: '1.13'
 main: com.darkyen.minecraft.DeadSouls
-authors: [Darkyen]
+prefix: '${name}'
+name: '${name}'
+version: '${version}'
+description: '${description}'
+api-version: '1.13'
+authors: [ Darkyen, makeevrserg ]
+website: EmpireProjekt.ru
 commands:
   souls:
     description: View and manipulate souls
@@ -48,4 +51,4 @@ permissions:
   com.darkyen.minecraft.deadsouls.souls.goto.all:
     description: Teleport to any soul through /souls command
     default: op
-softdepend: [ItemSoulBind]
+softdepend: [ ItemSoulBind ]

@@ -1,9 +1,9 @@
 [versions]
 # Plugin/Mod core
-plugin = "4.0.0"
-name = "AstraTemplate"
+plugin = "2.0.0"
+name = "DeadSoulsKT"
 group = "com.astrainteractive"
-description = "Template plugin for EmpireProjekt"
+description = "Continuation of DeadSouls plugin"
 destinationDirectoryPath = "D:\\Minecraft Servers\\EmpireProjekt_remake\\smp\\plugins"
 destinationDirectoryFabricPath = "C:\\Users\\makee\\Desktop\\server\\mods"
 destinationDirectoryForgePath = "C:\\Users\\makee\\Desktop\\Forge\\mods"
