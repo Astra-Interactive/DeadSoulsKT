@@ -24,6 +24,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import static com.darkyen.minecraft.di.Modules.getPluginConfig;
 import static com.darkyen.minecraft.utils.Util.distance2;
 
 public class SoulsCommands implements CommandExecutor {
@@ -56,12 +57,12 @@ public class SoulsCommands implements CommandExecutor {
         }
 
         if ("free".equalsIgnoreCase(word)) {
-            if (!instance.soulFreeingEnabled) {
+            if (!getPluginConfig().getSoulFreeingEnabled()) {
                 sender.sendMessage(org.bukkit.ChatColor.RED+"This world does not understand the concept of freeing");
                 return true;
             }
 
-            soulDatabase.freeSoul(sender, number, instance.soulFreeAfterMs,
+            soulDatabase.freeSoul(sender, number, getPluginConfig().getSoulFreeAfterMs().getValue(),
                     sender.hasPermission("com.darkyen.minecraft.deadsouls.souls.free"),
                     sender.hasPermission("com.darkyen.minecraft.deadsouls.souls.free.all"));
             return true;

@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import static com.darkyen.minecraft.di.Modules.getPluginConfig;
 import static com.darkyen.minecraft.api.DeadSoulsAPIImpl.NO_ITEM_STACKS;
 import static com.darkyen.minecraft.utils.Util.getTotalExperience;
 
@@ -112,7 +113,7 @@ public class SoulsEventListener implements EventListener {
 
         Location soulLocation = null;
         try {
-            if (instance.smartSoulPlacement) {
+            if (getPluginConfig().getSmartSoulPlacement().getValue()) {
                 PlayerSoulInfo info = instance.watchedPlayers.get(player);
                 if (info == null) {
                     instance.getLogger().log(Level.WARNING, "Player " + player + " was not watched!");
@@ -133,7 +134,7 @@ public class SoulsEventListener implements EventListener {
         }
 
         final UUID owner;
-        if ((pvp && instance.pvpBehavior == PvPBehavior.FREE) || instance.soulFreeAfterMs <= 0) {
+        if ((pvp && instance.pvpBehavior == PvPBehavior.FREE) || getPluginConfig().getSoulFreeAfterMs().getValue() <= 0) {
             owner = null;
         } else {
             owner = player.getUniqueId();
@@ -153,25 +154,25 @@ public class SoulsEventListener implements EventListener {
         }
 
         // Do not offer to free the soul if it will be free sooner than the player can click the button
-        if (owner != null && instance.soulFreeAfterMs > 1000
-                && instance.soulFreeingEnabled && instance.textFreeMySoul != null && !instance.textFreeMySoul.isEmpty()
+        if (owner != null && getPluginConfig().getSoulFreeAfterMs().getValue() > 1000
+                && getPluginConfig().getSoulFreeingEnabled() && getPluginConfig().getTextFreeMySoul().getValue() != null && !getPluginConfig().getTextFreeMySoul().getValue().isEmpty()
                 && (player.hasPermission("com.darkyen.minecraft.deadsouls.souls.free")
                 || player.hasPermission("com.darkyen.minecraft.deadsouls.souls.free.all"))) {
             final TextComponent star = new TextComponent("✦");
             star.setColor(ChatColor.YELLOW);
-            final TextComponent freeMySoul = new TextComponent(" "+instance.textFreeMySoul+" ");
+            final TextComponent freeMySoul = new TextComponent(" "+getPluginConfig().getTextFreeMySoul().getValue()+" ");
             freeMySoul.setColor(ChatColor.GOLD);
             freeMySoul.setBold(true);
             freeMySoul.setUnderlined(true);
-            if (instance.textFreeMySoulTooltip != null && !instance.textFreeMySoulTooltip.isEmpty()) {
-                SpigotCompat.textComponentSetHoverText(freeMySoul, instance.textFreeMySoulTooltip);
+            if (getPluginConfig().getTextFreeMySoulTooltip().getValue() != null && !getPluginConfig().getTextFreeMySoulTooltip().getValue().isEmpty()) {
+                SpigotCompat.textComponentSetHoverText(freeMySoul, getPluginConfig().getTextFreeMySoulTooltip().getValue());
             }
             freeMySoul.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/souls free " + soulId));
             player.spigot().sendMessage(ChatMessageType.CHAT, star, freeMySoul, star);
         }
 
-        if (!instance.soundSoulDropped.isEmpty()) {
-            world.playSound(soulLocation, instance.soundSoulDropped, SoundCategory.MASTER, 1.1f, 1.7f);
+        if (!getPluginConfig().getSoundSoulDropped().getValue().isEmpty()) {
+            world.playSound(soulLocation, getPluginConfig().getSoundSoulDropped().getValue(), SoundCategory.MASTER, 1.1f, 1.7f);
         }
 
         // No need to set setKeepInventory/Level to false, because if we got here, it already is false
@@ -214,8 +215,8 @@ public class SoulsEventListener implements EventListener {
         soulDatabase.addSoul(null, world.getUID(), soulLocation.getX(), soulLocation.getY(), soulLocation.getZ(), soulItems, soulXp);
         instance.refreshNearbySoulCache = true;
 
-        if (!instance.soundSoulDropped.isEmpty()) {
-            world.playSound(soulLocation, instance.soundSoulDropped, SoundCategory.MASTER, 1.1f, 1.7f);
+        if (!getPluginConfig().getSoundSoulDropped().getValue().isEmpty()) {
+            world.playSound(soulLocation, getPluginConfig().getSoundSoulDropped().getValue(), SoundCategory.MASTER, 1.1f, 1.7f);
         }
 
         event.getDrops().clear();

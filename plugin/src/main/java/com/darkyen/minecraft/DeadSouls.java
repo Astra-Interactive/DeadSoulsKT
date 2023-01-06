@@ -4,6 +4,7 @@ import com.darkyen.minecraft.api.DeadSoulsAPI;
 import com.darkyen.minecraft.api.DeadSoulsAPIImpl;
 import com.darkyen.minecraft.commands.SoulsCommands;
 import com.darkyen.minecraft.database.SoulDatabase;
+import com.darkyen.minecraft.di.Modules;
 import com.darkyen.minecraft.events.SoulPickupEvent;
 import com.darkyen.minecraft.events.SoulsEventListener;
 import com.darkyen.minecraft.models.Soul;
@@ -34,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import static com.darkyen.minecraft.di.Modules.getPluginConfig;
 import static com.darkyen.minecraft.api.DeadSoulsAPIImpl.NO_ITEM_STACKS;
 import static com.darkyen.minecraft.utils.Util.*;
 
@@ -53,68 +55,15 @@ public final class DeadSouls extends JavaPlugin {
     }
     @Nullable
     public SoulDatabase soulDatabase;
-    public long soulFreeAfterMs = Long.MAX_VALUE;
-    long soulFadesAfterMs = Long.MAX_VALUE;
 
-    private long autoSaveMs = 0L;
 
     public float retainedXPPercent;
     public int retainedXPPerLevel;
 
-    @NotNull
-    private static final String DEFAULT_SOUND_SOUL_COLLECT_XP = "entity.experience_orb.pickup";
-    @NotNull
-    private String soundSoulCollectXp = DEFAULT_SOUND_SOUL_COLLECT_XP;
-    @NotNull
-    private static final String DEFAULT_SOUND_SOUL_COLLECT_ITEM = "item.trident.return";
-    @NotNull
-    private String soundSoulCollectItem = DEFAULT_SOUND_SOUL_COLLECT_ITEM;
-    @NotNull
-    private static final String DEFAULT_SOUND_SOUL_DEPLETED = "entity.generic.extinguish_fire";
-    @NotNull
-    private String soundSoulDepleted = DEFAULT_SOUND_SOUL_DEPLETED;
-    @NotNull
-    private static final String DEFAULT_SOUND_SOUL_CALLING = "block.beacon.ambient";
-    @NotNull
-    private String soundSoulCalling = DEFAULT_SOUND_SOUL_CALLING;
-    private static final float DEFAULT_VOLUME_SOUL_CALLING = 16f;
-    private float volumeSoulCalling = DEFAULT_VOLUME_SOUL_CALLING;
-    @NotNull
-    private static final String DEFAULT_SOUND_SOUL_DROPPED = "block.bell.resonate";
-    @NotNull
-    public String soundSoulDropped = DEFAULT_SOUND_SOUL_DROPPED;
-
-    @NotNull
-    private static final String DEFAULT_TEXT_FREE_MY_SOUL = "Free my soul";
-    @Nullable
-    public String textFreeMySoul = DEFAULT_TEXT_FREE_MY_SOUL;
-    @NotNull
-    private static final String DEFAULT_TEXT_FREE_MY_SOUL_TOOLTIP = "Allows other players to collect the soul immediately";
-    @Nullable
-    public String textFreeMySoulTooltip = DEFAULT_TEXT_FREE_MY_SOUL_TOOLTIP;
-
-    public boolean soulFreeingEnabled = true;
-
-    public boolean smartSoulPlacement = true;
 
     @NotNull
     public PvPBehavior pvpBehavior = PvPBehavior.NORMAL;
 
-    @NotNull
-    private static final Color DEFAULT_SOUL_DUST_COLOR_ITEMS = Color.WHITE;
-    private static final float DEFAULT_SOUL_DUST_SIZE_ITEMS = 2f;
-    @NotNull
-    private static final Color DEFAULT_SOUL_DUST_COLOR_XP = Color.AQUA;
-    private static final float DEFAULT_SOUL_DUST_SIZE_XP = 2f;
-    @NotNull
-    private static final Color DEFAULT_SOUL_DUST_COLOR_GONE = Color.YELLOW;
-    private static final float DEFAULT_SOUL_DUST_SIZE_GONE = 3f;
-    @NotNull
-    private Particle.DustOptions soulDustOptionsItems = new Particle.DustOptions(DEFAULT_SOUL_DUST_COLOR_ITEMS, DEFAULT_SOUL_DUST_SIZE_ITEMS);
-    @NotNull
-    private Particle.DustOptions soulDustOptionsXp = new Particle.DustOptions(DEFAULT_SOUL_DUST_COLOR_XP, DEFAULT_SOUL_DUST_SIZE_XP);
-    @NotNull
-    private Particle.DustOptions soulDustOptionsGone = new Particle.DustOptions(DEFAULT_SOUL_DUST_COLOR_GONE, DEFAULT_SOUL_DUST_SIZE_GONE);
 
     public final Set<EntityType> animalsWithSouls = new HashSet<>();
 
@@ -125,7 +74,7 @@ public final class DeadSouls extends JavaPlugin {
     public final HashMap<Player, PlayerSoulInfo> watchedPlayers = new HashMap<>();
     public boolean refreshNearbySoulCache = false;
 
-    private static final double COLLECTION_DISTANCE2 = NumberConversions.square(1);
+    public static final double COLLECTION_DISTANCE2 = NumberConversions.square(1);
 
 
     @NotNull
@@ -145,8 +94,8 @@ public final class DeadSouls extends JavaPlugin {
         final PluginManager pluginManager = getServer().getPluginManager();
         final long now = System.currentTimeMillis();
 
-        if (now > processPlayers_nextFadeCheck && soulFadesAfterMs < Long.MAX_VALUE) {
-            final int faded = soulDatabase.removeFadedSouls(soulFadesAfterMs);
+        if (now > processPlayers_nextFadeCheck && getPluginConfig().getSoulFadesAfterMs().getValue() < Long.MAX_VALUE) {
+            final int faded = soulDatabase.removeFadedSouls(getPluginConfig().getSoulFadesAfterMs().getValue());
             if (faded > 0) {
                 this.refreshNearbySoulCache = true;
                 getLogger().log(Level.FINE, "Removed "+faded+" faded soul(s)");
@@ -157,7 +106,7 @@ public final class DeadSouls extends JavaPlugin {
         final boolean refreshNearbySoulCache = this.refreshNearbySoulCache;
         this.refreshNearbySoulCache = false;
 
-        final boolean playCallingSounds = !soundSoulCalling.isEmpty() && volumeSoulCalling > 0f && this.processPlayers_random.nextInt(12) == 0;
+        final boolean playCallingSounds = !getPluginConfig().getSoundSoulCalling().getValue().isEmpty() && getPluginConfig().getVolumeSoulCalling().getValue() > 0f && this.processPlayers_random.nextInt(12) == 0;
 
         boolean databaseChanged = false;
 
@@ -211,7 +160,7 @@ public final class DeadSouls extends JavaPlugin {
             final boolean canSeeAllSouls = playerGameMode == GameMode.SPECTATOR && player.hasPermission("com.darkyen.minecraft.deadsouls.spectatesouls");
             for (int i = 0; i < soulCount && remainingSoulsToShow > 0; i++) {
                 final Soul soul = visibleSouls.get(i);
-                if (!canSeeAllSouls && !soul.isAccessibleBy(player, now, soulFreeAfterMs)) {
+                if (!canSeeAllSouls && !soul.isAccessibleBy(player, now, getPluginConfig().getSoulFreeAfterMs().getValue())) {
                     // Soul of somebody else, do not show nor collect
                     continue;
                 }
@@ -223,14 +172,14 @@ public final class DeadSouls extends JavaPlugin {
 
                 // Show this soul!
                 if (soul.getExperiencePoints() > 0 && soul.getItems().length > 0) {
-                    player.spawnParticle(Particle.REDSTONE, soulLocation, 10, 0.1, 0.1, 0.1, soulDustOptionsItems);
-                    player.spawnParticle(Particle.REDSTONE, soulLocation, 10, 0.12, 0.12, 0.12, soulDustOptionsXp);
+                    player.spawnParticle(Particle.REDSTONE, soulLocation, 10, 0.1, 0.1, 0.1, getPluginConfig().getSoulDustOptionsItems().getValue());
+                    player.spawnParticle(Particle.REDSTONE, soulLocation, 10, 0.12, 0.12, 0.12, getPluginConfig().getSoulDustOptionsXp().getValue());
                 } else if (soul.getExperiencePoints() > 0) {
                     // Only xp
-                    player.spawnParticle(Particle.REDSTONE, soulLocation, 20, 0.1, 0.1, 0.1, soulDustOptionsXp);
+                    player.spawnParticle(Particle.REDSTONE, soulLocation, 20, 0.1, 0.1, 0.1, getPluginConfig().getSoulDustOptionsXp().getValue());
                 } else {
                     // Only items
-                    player.spawnParticle(Particle.REDSTONE, soulLocation, 20, 0.1, 0.1, 0.1, soulDustOptionsItems);
+                    player.spawnParticle(Particle.REDSTONE, soulLocation, 20, 0.1, 0.1, 0.1, getPluginConfig().getSoulDustOptionsItems().getValue());
                 }
                 remainingSoulsToShow--;
             }
@@ -242,7 +191,7 @@ public final class DeadSouls extends JavaPlugin {
                 //noinspection ForLoopReplaceableByForEach
                 for (int soulI = 0; soulI < visibleSouls.size(); soulI++) {
                     final Soul closestSoul = visibleSouls.get(soulI);
-                    if (!closestSoul.isAccessibleBy(player, now, soulFreeAfterMs)) {
+                    if (!closestSoul.isAccessibleBy(player, now, getPluginConfig().getSoulFreeAfterMs().getValue())) {
                         // Soul of somebody else, do not collect
                         continue;
                     }
@@ -260,8 +209,8 @@ public final class DeadSouls extends JavaPlugin {
                             if (closestSoul.getExperiencePoints() > 0) {
                                 player.giveExp(closestSoul.getExperiencePoints());
                                 closestSoul.setExperiencePoints(0);
-                                if (!soundSoulCollectXp.isEmpty() && closestSoulLocation != null) {
-                                    player.playSound(closestSoulLocation, soundSoulCollectXp, 1f, 1f);
+                                if (!getPluginConfig().getSoundSoulCollectXp().getValue().isEmpty() && closestSoulLocation != null) {
+                                    player.playSound(closestSoulLocation, getPluginConfig().getSoundSoulCollectXp().getValue(), 1f, 1f);
                                 }
                                 databaseChanged = true;
                             }
@@ -289,8 +238,8 @@ public final class DeadSouls extends JavaPlugin {
                                     }
                                 }
 
-                                if (someCollected && !soundSoulCollectItem.isEmpty() && closestSoulLocation != null) {
-                                    player.playSound(closestSoulLocation, soundSoulCollectItem, 1f, 0.5f);
+                                if (someCollected && !getPluginConfig().getSoundSoulCollectItem().getValue().isEmpty() && closestSoulLocation != null) {
+                                    player.playSound(closestSoulLocation, getPluginConfig().getSoundSoulCollectItem().getValue(), 1f, 0.5f);
                                 }
                             }
 
@@ -301,15 +250,16 @@ public final class DeadSouls extends JavaPlugin {
 
                                 // Do some fancy effect
                                 if (closestSoulLocation != null) {
-                                    if (!soundSoulDepleted.isEmpty()) {
-                                        player.playSound(closestSoulLocation, soundSoulDepleted, 0.1f, 0.5f);
+
+                                    if (!getPluginConfig().getSoundSoulDepleted().getValue().isEmpty()) {
+                                        player.playSound(closestSoulLocation, getPluginConfig().getSoundSoulDepleted().getValue(), 0.1f, 0.5f);
                                     }
-                                    player.spawnParticle(Particle.REDSTONE, closestSoulLocation, 20, 0.2, 0.2, 0.2, soulDustOptionsGone);
+                                    player.spawnParticle(Particle.REDSTONE, closestSoulLocation, 20, 0.2, 0.2, 0.2, getPluginConfig().getSoulDustOptionsGone().getValue());
                                 }
                             }
                         }
                     } else if (playCallingSounds && closestSoulLocation != null) {
-                        player.playSound(closestSoulLocation, soundSoulCalling, volumeSoulCalling, 0.75f);
+                        player.playSound(closestSoulLocation, getPluginConfig().getSoundSoulCalling().getValue(), getPluginConfig().getVolumeSoulCalling().getValue(), 0.75f);
                     }
                     break;
                 }
@@ -320,7 +270,7 @@ public final class DeadSouls extends JavaPlugin {
             soulDatabase.markDirty();
         }
 
-        final long autoSaveMs = this.autoSaveMs;
+        final long autoSaveMs = getPluginConfig().getAutoSaveMs().getValue();
         if (now > processPlayers_nextAutoSave) {
             processPlayers_nextAutoSave = now + autoSaveMs;
             soulDatabase.autoSave();
@@ -330,11 +280,8 @@ public final class DeadSouls extends JavaPlugin {
     @Override
     public void onEnable() {
         AstraLibs.INSTANCE.rememberPlugin(this);
-        final FileConfiguration config = getConfig();
+        final FileConfiguration config = Modules.getConfigurationModule().getValue().getFileConfiguration();
         final Logger LOG = getLogger();
-        soulFreeAfterMs = parseTimeMs(config.getString("soul-free-after"), Long.MAX_VALUE, LOG);
-        soulFadesAfterMs = parseTimeMs(config.getString("soul-fades-after"), Long.MAX_VALUE, LOG);
-        autoSaveMs = parseTimeMs(config.getString("auto-save"), 0L, LOG);
 
         {
             this.retainedXPPercent = 90;
@@ -370,21 +317,6 @@ public final class DeadSouls extends JavaPlugin {
             }
         }
 
-        soundSoulCollectXp = normalizeKey(config.getString("sound-soul-collect-xp", DEFAULT_SOUND_SOUL_COLLECT_XP));
-        soundSoulCollectItem = normalizeKey(config.getString("sound-soul-collect-item", DEFAULT_SOUND_SOUL_COLLECT_ITEM));
-        soundSoulDepleted = normalizeKey(config.getString("sound-soul-depleted", DEFAULT_SOUND_SOUL_DEPLETED));
-        soundSoulCalling = normalizeKey(config.getString("sound-soul-calling", DEFAULT_SOUND_SOUL_CALLING));
-        soundSoulDropped = normalizeKey(config.getString("sound-soul-dropped", DEFAULT_SOUND_SOUL_DROPPED));
-        volumeSoulCalling = (float)config.getDouble("volume-soul-calling", DEFAULT_VOLUME_SOUL_CALLING);
-
-        soulDustOptionsItems = new Particle.DustOptions(parseColor(config.getString("color-soul-items"), DEFAULT_SOUL_DUST_COLOR_ITEMS, LOG), DEFAULT_SOUL_DUST_SIZE_ITEMS);
-        soulDustOptionsXp = new Particle.DustOptions(parseColor(config.getString("color-soul-xp"), DEFAULT_SOUL_DUST_COLOR_XP, LOG), DEFAULT_SOUL_DUST_SIZE_XP);
-        soulDustOptionsGone = new Particle.DustOptions(parseColor(config.getString("color-soul-gone"), DEFAULT_SOUL_DUST_COLOR_GONE, LOG), DEFAULT_SOUL_DUST_SIZE_GONE);
-
-        textFreeMySoul = config.getString("text-free-my-soul", DEFAULT_TEXT_FREE_MY_SOUL);
-        textFreeMySoulTooltip = config.getString("text-free-my-soul-tooltip", DEFAULT_TEXT_FREE_MY_SOUL_TOOLTIP);
-        soulFreeingEnabled = textFreeMySoul != null && !textFreeMySoul.isEmpty();
-
         {
             String pvpBehaviorString = config.getString("pvp-behavior");
             if (pvpBehaviorString == null) {
@@ -406,7 +338,6 @@ public final class DeadSouls extends JavaPlugin {
             }
         }
 
-        smartSoulPlacement = config.getBoolean("smart-soul-placement", true);
 
         animalsWithSouls.clear();
         for (String animalName : config.getStringList("animals-with-souls")) {
@@ -459,7 +390,7 @@ public final class DeadSouls extends JavaPlugin {
             final Path dataFolder = getDataFolder().toPath();
             final Path soulDb = dataFolder.resolve("soul-db.bin");
             soulDatabase = new SoulDatabase(this, soulDb);
-            api = new DeadSoulsAPIImpl(soulDatabase, soulFreeAfterMs, refreshNearbySoulCache);
+            api = new DeadSoulsAPIImpl(soulDatabase, getPluginConfig().getSoulFreeAfterMs().getValue(), refreshNearbySoulCache);
             final Path legacySoulDb = dataFolder.resolve("souldb.bin");
             if (Files.exists(legacySoulDb)) {
                 try {
@@ -506,7 +437,7 @@ public final class DeadSouls extends JavaPlugin {
         final SoulDatabase soulDatabase = this.soulDatabase;
         if (soulDatabase != null) {
             try {
-                final int faded = soulDatabase.removeFadedSouls(soulFadesAfterMs);
+                final int faded = soulDatabase.removeFadedSouls(getPluginConfig().getSoulFadesAfterMs().getValue());
                 if (faded > 0) {
                     getLogger().log(Level.FINE, "Removed "+faded+" faded soul(s)");
                 }
