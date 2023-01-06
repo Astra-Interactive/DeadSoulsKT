@@ -1,5 +1,6 @@
-package com.darkyen.minecraft.api
+package com.darkyen.minecraft.events
 
+import com.darkyen.minecraft.models.ISoul
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import org.bukkit.event.Event

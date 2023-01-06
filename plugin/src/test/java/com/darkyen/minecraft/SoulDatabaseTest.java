@@ -1,9 +1,8 @@
 package com.darkyen.minecraft;
 
-import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
-import com.darkyen.minecraft.api.ISoul;
-import com.darkyen.minecraft.api.Soul;
+import com.darkyen.minecraft.models.Soul;
+import com.darkyen.minecraft.database.SoulDatabase;
 import com.darkyen.minecraft.mock.ServerStub;
 import com.darkyen.minecraft.utils.channels.ByteBufferChannel;
 import com.darkyen.minecraft.utils.channels.DataInputChannel;

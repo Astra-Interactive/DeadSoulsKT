@@ -1,7 +1,8 @@
 package com.darkyen.minecraft.api;
 
-import com.darkyen.minecraft.DeadSouls;
-import com.darkyen.minecraft.SoulDatabase;
+import com.darkyen.minecraft.database.SoulDatabase;
+import com.darkyen.minecraft.models.ISoul;
+import com.darkyen.minecraft.models.Soul;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,6 +10,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 public class DeadSoulsAPIImpl implements DeadSoulsAPI {
+    @NotNull
+    public static final ItemStack[] NO_ITEM_STACKS = new ItemStack[0];
     @Nullable
     private SoulDatabase soulDatabase;
     long soulFreeAfterMs;
@@ -168,7 +171,7 @@ public class DeadSoulsAPIImpl implements DeadSoulsAPI {
 
     @Override
     public @NotNull ISoul createSoul(@Nullable UUID owner, @NotNull UUID world, double x, double y, double z, @Nullable ItemStack[] contents, int xp) {
-        ItemStack[] nnContents = contents == null ? DeadSouls.NO_ITEM_STACKS : contents;
+        ItemStack[] nnContents = contents == null ? NO_ITEM_STACKS : contents;
         final SoulDatabase soulDatabase = this.soulDatabase;
         if (soulDatabase == null) {
             // Sad, but better than returning null which would probably cause crash. This situation can be tested through soulExists.

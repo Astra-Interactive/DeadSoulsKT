@@ -51,3 +51,4 @@ rootProject.name = "DeadSoulsKT"
 // Spigot
 include("plugin")
 include("api-test")
+include("api")

@@ -29,6 +29,4 @@ dependencies {
     compileOnly(libs.paperApi)
     compileOnly(libs.spigotApi)
     compileOnly(libs.spigot)
-    // Local
-    implementation(project(":api"))
 }

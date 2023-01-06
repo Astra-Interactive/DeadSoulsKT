@@ -1,9 +1,9 @@
 package com.darkyen.minecraft;
 
 import com.darkyen.minecraft.api.DeadSoulsAPI;
-import com.darkyen.minecraft.api.ISoul;
-import com.darkyen.minecraft.api.Soul;
-import com.darkyen.minecraft.api.SoulPickupEvent;
+import com.darkyen.minecraft.api.DeadSoulsAPIImpl;
+import com.darkyen.minecraft.events.SoulPickupEvent;
+import com.darkyen.minecraft.models.ISoul;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Server;
@@ -30,7 +30,8 @@ public class DeadSoulsApiTest extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		try {
-			final DeadSoulsAPI api = DeadSoulsAPI.instance();
+			// TODO
+			final DeadSoulsAPI api = null; //DeadSoulsAPI.instance();
 
 			final Server server = getServer();
 			final ArrayList<ISoul> souls = new ArrayList<>();

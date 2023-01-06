@@ -1,4 +1,4 @@
-package com.darkyen.minecraft;
+package com.darkyen.minecraft.database;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -23,16 +23,16 @@ public final class SpatialDatabase<E extends SpatialDatabase.Entry> {
     private ChunkBucket<E>[] buckets = new ChunkBucket[16];
     private int bucketCount = 0;
 
-    static long key(int x, int y) {
+    public static long key(int x, int y) {
         // Y is sign-shifted
         return (long) x << 32L | ((y + 0x8000_0000L) & 0xFFFFFFFFL);
     }
 
-    static int keyX(long key) {
+    public static int keyX(long key) {
         return (int) (key >> 32);
     }
 
-    static int keyY(long key) {
+    public static int keyY(long key) {
         return (int) ((key & 0xFFFFFFFFL) - 0x8000_0000L);
     }
 

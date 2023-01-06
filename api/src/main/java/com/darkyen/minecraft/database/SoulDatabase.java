@@ -1,6 +1,6 @@
-package com.darkyen.minecraft;
+package com.darkyen.minecraft.database;
 
-import com.darkyen.minecraft.api.Soul;
+import com.darkyen.minecraft.models.Soul;
 import com.darkyen.minecraft.utils.serialization.Serialization;
 import com.darkyen.minecraft.utils.Util;
 import com.darkyen.minecraft.utils.channels.DataInputChannel;
@@ -45,7 +45,7 @@ public final class SoulDatabase {
 
     private static final Logger LOG = Logger.getLogger("DeadSouls-ItemStore");
 
-    static final int CURRENT_DB_VERSION = 1;
+    public static final int CURRENT_DB_VERSION = 1;
     public static final int SOUL_STORE_SCALE = 16;
 
     @Nullable
@@ -80,7 +80,7 @@ public final class SoulDatabase {
 	    return soulsById;
     }
 
-    ArrayList<@NotNull Soul> getSoulsByOwnerAndWorld(@Nullable UUID owner, @Nullable UUID world) {
+    public ArrayList<@NotNull Soul> getSoulsByOwnerAndWorld(@Nullable UUID owner, @Nullable UUID world) {
         final ArrayList<Soul> result = new ArrayList<>();
         synchronized (soulsById) {
             final ArrayList<@Nullable Soul> soulsById = this.soulsById;
@@ -351,7 +351,7 @@ public final class SoulDatabase {
     }
 
 
-    static boolean serializeSoul(@NotNull Soul soul, @NotNull DataOutputChannel out) {
+    public static boolean serializeSoul(@NotNull Soul soul, @NotNull DataOutputChannel out) {
         final @NotNull ItemStack[] items = soul.getItems();
         try {
             serializeUUID(soul.getWorld(), out);
@@ -401,7 +401,7 @@ public final class SoulDatabase {
     }
 
     @NotNull
-    static Soul deserializeSoul(@NotNull DataInput in, int version) throws IOException, Serialization.Exception {
+    public static Soul deserializeSoul(@NotNull DataInput in, int version) throws IOException, Serialization.Exception {
         final UUID worldUUID = deserializeUUID(in);
         final double locationX = version == 0 ? in.readInt() : in.readDouble();
         final double locationY = version == 0 ? in.readInt() : in.readDouble();

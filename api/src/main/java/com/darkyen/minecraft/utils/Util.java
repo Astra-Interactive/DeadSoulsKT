@@ -1,6 +1,6 @@
 package com.darkyen.minecraft.utils;
 
-import com.darkyen.minecraft.api.Soul;
+import com.darkyen.minecraft.models.Soul;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.World;

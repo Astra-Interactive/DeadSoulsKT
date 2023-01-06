@@ -1,5 +1,6 @@
 package com.darkyen.minecraft;
 
+import com.darkyen.minecraft.database.SpatialDatabase;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;

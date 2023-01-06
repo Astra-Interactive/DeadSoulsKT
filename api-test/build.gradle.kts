@@ -18,6 +18,7 @@ dependencies {
     implementation(libs.astralibs.ktxCore)
     implementation(libs.astralibs.spigotCore)
     implementation(libs.bstats.bukkit)
+    implementation(project(mapOf("path" to ":api")))
     // Test
 //    testImplementation(kotlin("test"))
 //    testImplementation(libs.orgTesting)
@@ -28,4 +29,5 @@ dependencies {
     compileOnly(libs.spigot)
     // Local
     implementation(project(":plugin"))
+    implementation(project(":api"))
 }

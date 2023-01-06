@@ -1,7 +1,7 @@
-package com.darkyen.minecraft.api
+package com.darkyen.minecraft.models
 
-import com.darkyen.minecraft.SoulDatabase
-import com.darkyen.minecraft.SpatialDatabase
+import com.darkyen.minecraft.database.SoulDatabase
+import com.darkyen.minecraft.database.SpatialDatabase
 import com.darkyen.minecraft.utils.Util
 import org.bukkit.Bukkit
 import org.bukkit.Location

@@ -1,4 +1,4 @@
-package com.darkyen.minecraft.api
+package com.darkyen.minecraft.models
 
 import org.bukkit.Location
 import org.bukkit.inventory.ItemStack

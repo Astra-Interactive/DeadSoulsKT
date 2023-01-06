@@ -1,6 +1,9 @@
 package com.darkyen.minecraft;
 
 import com.darkyen.minecraft.api.*;
+import com.darkyen.minecraft.database.SoulDatabase;
+import com.darkyen.minecraft.events.SoulPickupEvent;
+import com.darkyen.minecraft.models.Soul;
 import com.darkyen.minecraft.utils.SpigotCompat;
 import com.darkyen.minecraft.utils.Util;
 import net.md_5.bungee.api.ChatColor;
@@ -48,13 +51,11 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
@@ -63,6 +64,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import static com.darkyen.minecraft.api.DeadSoulsAPIImpl.NO_ITEM_STACKS;
 import static com.darkyen.minecraft.utils.Util.distance2;
 import static com.darkyen.minecraft.utils.Util.getTotalExperience;
 import static com.darkyen.minecraft.utils.Util.isNear;
@@ -161,8 +163,7 @@ public final class DeadSouls extends JavaPlugin implements Listener {
 
     private static final double COLLECTION_DISTANCE2 = NumberConversions.square(1);
 
-    @NotNull
-    public static final ItemStack[] NO_ITEM_STACKS = new ItemStack[0];
+
     @NotNull
     private final ComparatorSoulDistanceTo processPlayers_comparatorDistanceTo = new ComparatorSoulDistanceTo();
     @NotNull

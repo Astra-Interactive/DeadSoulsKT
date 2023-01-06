@@ -1,5 +1,6 @@
 package com.darkyen.minecraft;
 
+import com.darkyen.minecraft.database.SoulDatabase;
 import com.darkyen.minecraft.utils.serialization.Serialization;
 
 import java.io.IOException;
