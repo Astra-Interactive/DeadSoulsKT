@@ -1,41 +1,18 @@
 package com.darkyen.minecraft;
 
-import com.darkyen.minecraft.api.*;
+import com.darkyen.minecraft.api.DeadSoulsAPI;
+import com.darkyen.minecraft.api.DeadSoulsAPIImpl;
+import com.darkyen.minecraft.commands.SoulsCommands;
 import com.darkyen.minecraft.database.SoulDatabase;
 import com.darkyen.minecraft.events.SoulPickupEvent;
+import com.darkyen.minecraft.events.SoulsEventListener;
 import com.darkyen.minecraft.models.Soul;
-import com.darkyen.minecraft.utils.SpigotCompat;
-import com.darkyen.minecraft.utils.Util;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.Color;
-import org.bukkit.GameMode;
-import org.bukkit.GameRule;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.Particle;
-import org.bukkit.Server;
-import org.bukkit.SoundCategory;
-import org.bukkit.World;
+import com.darkyen.minecraft.utils.*;
+import org.bukkit.*;
 import org.bukkit.block.Block;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -45,38 +22,25 @@ import org.bukkit.plugin.java.JavaPluginLoader;
 import org.bukkit.util.NumberConversions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.astrainteractive.astralibs.AstraLibs;
+import ru.astrainteractive.astralibs.events.GlobalEventManager;
 
 import java.io.File;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import static com.darkyen.minecraft.api.DeadSoulsAPIImpl.NO_ITEM_STACKS;
-import static com.darkyen.minecraft.utils.Util.distance2;
-import static com.darkyen.minecraft.utils.Util.getTotalExperience;
-import static com.darkyen.minecraft.utils.Util.isNear;
-import static com.darkyen.minecraft.utils.Util.normalizeKey;
-import static com.darkyen.minecraft.utils.Util.parseColor;
-import static com.darkyen.minecraft.utils.Util.parseTimeMs;
-import static com.darkyen.minecraft.utils.Util.set;
+import static com.darkyen.minecraft.utils.Util.*;
 
 /**
  *
  */
-public final class DeadSouls extends JavaPlugin implements Listener {
+public final class DeadSouls extends JavaPlugin {
     // Need for MockBukkit testing
     public DeadSouls()
     {
@@ -88,14 +52,14 @@ public final class DeadSouls extends JavaPlugin implements Listener {
         super(loader, description, dataFolder, file);
     }
     @Nullable
-    private SoulDatabase soulDatabase;
-    private long soulFreeAfterMs = Long.MAX_VALUE;
-    private long soulFadesAfterMs = Long.MAX_VALUE;
+    public SoulDatabase soulDatabase;
+    public long soulFreeAfterMs = Long.MAX_VALUE;
+    long soulFadesAfterMs = Long.MAX_VALUE;
 
     private long autoSaveMs = 0L;
 
-    private float retainedXPPercent;
-    private int retainedXPPerLevel;
+    public float retainedXPPercent;
+    public int retainedXPPerLevel;
 
     @NotNull
     private static final String DEFAULT_SOUND_SOUL_COLLECT_XP = "entity.experience_orb.pickup";
@@ -118,23 +82,23 @@ public final class DeadSouls extends JavaPlugin implements Listener {
     @NotNull
     private static final String DEFAULT_SOUND_SOUL_DROPPED = "block.bell.resonate";
     @NotNull
-    private String soundSoulDropped = DEFAULT_SOUND_SOUL_DROPPED;
+    public String soundSoulDropped = DEFAULT_SOUND_SOUL_DROPPED;
 
     @NotNull
     private static final String DEFAULT_TEXT_FREE_MY_SOUL = "Free my soul";
     @Nullable
-    private String textFreeMySoul = DEFAULT_TEXT_FREE_MY_SOUL;
+    public String textFreeMySoul = DEFAULT_TEXT_FREE_MY_SOUL;
     @NotNull
     private static final String DEFAULT_TEXT_FREE_MY_SOUL_TOOLTIP = "Allows other players to collect the soul immediately";
     @Nullable
-    private String textFreeMySoulTooltip = DEFAULT_TEXT_FREE_MY_SOUL_TOOLTIP;
+    public String textFreeMySoulTooltip = DEFAULT_TEXT_FREE_MY_SOUL_TOOLTIP;
 
-    private boolean soulFreeingEnabled = true;
+    public boolean soulFreeingEnabled = true;
 
-    private boolean smartSoulPlacement = true;
+    public boolean smartSoulPlacement = true;
 
     @NotNull
-    private PvPBehavior pvpBehavior = PvPBehavior.NORMAL;
+    public PvPBehavior pvpBehavior = PvPBehavior.NORMAL;
 
     @NotNull
     private static final Color DEFAULT_SOUL_DUST_COLOR_ITEMS = Color.WHITE;
@@ -152,20 +116,18 @@ public final class DeadSouls extends JavaPlugin implements Listener {
     @NotNull
     private Particle.DustOptions soulDustOptionsGone = new Particle.DustOptions(DEFAULT_SOUL_DUST_COLOR_GONE, DEFAULT_SOUL_DUST_SIZE_GONE);
 
-    private final Set<EntityType> animalsWithSouls = new HashSet<>();
+    public final Set<EntityType> animalsWithSouls = new HashSet<>();
 
     private final ArrayList<Pattern> worldPatterns = new ArrayList<>();
-    private final HashSet<UUID> enabledWorlds = new HashSet<>();
+    public final HashSet<UUID> enabledWorlds = new HashSet<>();
 
     @NotNull
-    private final HashMap<Player, PlayerSoulInfo> watchedPlayers = new HashMap<>();
-    private boolean refreshNearbySoulCache = false;
+    public final HashMap<Player, PlayerSoulInfo> watchedPlayers = new HashMap<>();
+    public boolean refreshNearbySoulCache = false;
 
     private static final double COLLECTION_DISTANCE2 = NumberConversions.square(1);
 
 
-    @NotNull
-    private final ComparatorSoulDistanceTo processPlayers_comparatorDistanceTo = new ComparatorSoulDistanceTo();
     @NotNull
     private final Location processPlayers_playerLocation = new Location(null, 0, 0, 0);
     @NotNull
@@ -239,10 +201,7 @@ public final class DeadSouls extends JavaPlugin implements Listener {
             }
 
             { // Sort souls
-                final ComparatorSoulDistanceTo comparator = this.processPlayers_comparatorDistanceTo;
-                comparator.toX = playerLocation.getX();
-                comparator.toY = playerLocation.getY();
-                comparator.toZ = playerLocation.getZ();
+                final ComparatorSoulDistanceTo comparator = new ComparatorSoulDistanceTo(playerLocation.getX(),playerLocation.getY(),playerLocation.getZ());
                 visibleSouls.sort(comparator);
             }
 
@@ -370,6 +329,7 @@ public final class DeadSouls extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
+        AstraLibs.INSTANCE.rememberPlugin(this);
         final FileConfiguration config = getConfig();
         final Logger LOG = getLogger();
         soulFreeAfterMs = parseTimeMs(config.getString("soul-free-after"), Long.MAX_VALUE, LOG);
@@ -473,7 +433,7 @@ public final class DeadSouls extends JavaPlugin implements Listener {
         saveDefaultConfig();
 
         final Server server = getServer();
-        server.getPluginManager().registerEvents(this, this);
+        new SoulsEventListener(this).onEnable(GlobalEventManager.INSTANCE);
 
         // Run included tests
         for (String testClassName : new String[]{"com.darkyen.minecraft.ItemStoreTest"}) {
@@ -517,9 +477,11 @@ public final class DeadSouls extends JavaPlugin implements Listener {
         }
 
         server.getScheduler().runTaskTimer(this, this::processPlayers, 20, 20);
+
+        Objects.requireNonNull(getCommand("souls")).setExecutor(new SoulsCommands(this,soulDatabase));
     }
 
-    private void refreshEnabledWorlds() {
+    public void refreshEnabledWorlds() {
         final HashSet<UUID> worlds = this.enabledWorlds;
         worlds.clear();
 
@@ -554,529 +516,7 @@ public final class DeadSouls extends JavaPlugin implements Listener {
             }
             this.soulDatabase = null;
         }
-
+        GlobalEventManager.INSTANCE.onDisable();
         watchedPlayers.clear();
     }
-
-    @Override
-    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
-        final SoulDatabase soulDatabase = this.soulDatabase;
-        if (soulDatabase == null) {
-            getLogger().log(Level.WARNING, "processPlayers: soulDatabase not loaded yet");
-            return false;
-        }
-
-        if (!"souls".equalsIgnoreCase(command.getName())) {
-            return false;
-        }
-
-        final String word = args.length >= 1 ? args[0] : "";
-        int number;
-        try {
-            number = args.length >= 2 ? Integer.parseInt(args[1]) : -1;
-        } catch (NumberFormatException nfe) {
-            number = -1;
-        }
-
-        if ("free".equalsIgnoreCase(word)) {
-            if (!soulFreeingEnabled) {
-                sender.sendMessage(org.bukkit.ChatColor.RED+"This world does not understand the concept of freeing");
-                return true;
-            }
-
-            soulDatabase.freeSoul(sender, number, soulFreeAfterMs,
-                    sender.hasPermission("com.darkyen.minecraft.deadsouls.souls.free"),
-                    sender.hasPermission("com.darkyen.minecraft.deadsouls.souls.free.all"));
-            return true;
-        }
-
-        if ("goto".equalsIgnoreCase(word)) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage(org.bukkit.ChatColor.RED+"This sub-command is only accessible in-game");
-                return true;
-            }
-
-            final Soul soul = soulDatabase.getSoulById(number);
-            if (soul == null) {
-                sender.sendMessage(org.bukkit.ChatColor.RED+"This soul does not exist");
-                return true;
-            }
-
-            if (!sender.hasPermission("com.darkyen.minecraft.deadsouls.souls.goto.all")) {
-                if (soul.isOwnedBy(sender)) {
-                    if (!sender.hasPermission("com.darkyen.minecraft.deadsouls.souls.goto")) {
-                        sender.sendMessage(org.bukkit.ChatColor.RED+"You are not allowed to do that");
-                        return true;
-                    }
-                } else {
-                    sender.sendMessage(org.bukkit.ChatColor.RED+"You are not allowed to do that");
-                    return true;
-                }
-            }
-
-            final World world = getServer().getWorld(soul.getWorld());
-            if (world == null) {
-                sender.sendMessage(org.bukkit.ChatColor.RED+"The soul is not in any world");
-                return true;
-            }
-
-            ((Player)sender).teleport(new Location(world, soul.getLocationX(), soul.getLocationY(), soul.getLocationZ()), PlayerTeleportEvent.TeleportCause.COMMAND);
-            sender.sendMessage(org.bukkit.ChatColor.AQUA+"Teleported");
-            return true;
-        }
-
-        if ("reload".equalsIgnoreCase(word) && sender.isOp()) {
-            sender.sendMessage(org.bukkit.ChatColor.RED+"----------------------------");
-            sender.sendMessage(org.bukkit.ChatColor.RED+"Reloading plugin Dead Souls");
-            sender.sendMessage(org.bukkit.ChatColor.RED+"RELOAD FUNCTIONALITY IS ONLY FOR TESTING AND EXPERIMENTING AND SHOULD NEVER BE USED ON A LIVE SERVER!!!");
-            sender.sendMessage(org.bukkit.ChatColor.RED+"If you encounter any problems with the plugin after the reload, restart the server!");
-            sender.sendMessage(org.bukkit.ChatColor.RED+"----------------------------");
-
-            final Server server = getServer();
-            server.getPluginManager().disablePlugin(this);
-            reloadConfig();
-            server.getPluginManager().enablePlugin(this);
-
-            sender.sendMessage(org.bukkit.ChatColor.RED+" - Reload done - ");
-            return true;
-        }
-
-        boolean listOwnSouls = sender.hasPermission("com.darkyen.minecraft.deadsouls.souls");
-        boolean listAllSouls = sender.hasPermission("com.darkyen.minecraft.deadsouls.souls.all");
-
-        if (!listOwnSouls && !listAllSouls) {
-            return false;
-        }
-
-        if (word.isEmpty()) {
-            if (number < 0) {
-                number = 0;
-            }
-        } else if (!"page".equalsIgnoreCase(word)) {
-            return false;
-        }
-
-        final UUID senderUUID = (sender instanceof OfflinePlayer) ? ((OfflinePlayer) sender).getUniqueId() : null;
-
-        if (!(sender instanceof Player)) {
-            // Console output
-            final List<@Nullable Soul> soulsById = soulDatabase.getSoulsById();
-            int shownSouls = 0;
-            synchronized (soulsById) {
-                for (int id = 0; id < soulsById.size(); id++) {
-                    final Soul soul = soulsById.get(id);
-                    if (soul == null) {
-                        continue;
-                    }
-                    shownSouls++;
-
-                    final World world = getServer().getWorld(soul.getWorld());
-                    final String worldStr = world == null ? soul.getWorld().toString() : world.getName();
-
-                    final String ownerStr;
-                    if (soul.getOwner() == null) {
-                        ownerStr = "<free>";
-                    } else {
-                        final OfflinePlayer ownerPlayer = getServer().getOfflinePlayer(soul.getOwner());
-                        final String ownerPlayerName = ownerPlayer.getName();
-                        if (ownerPlayerName == null) {
-                            ownerStr = soul.getOwner().toString();
-                        } else {
-                            ownerStr = ownerPlayerName;
-                        }
-                    }
-
-                    sender.sendMessage(String.format("%d) %s %.1f %.1f %.1f   %s", id, worldStr, soul.getLocationX(), soul.getLocationY(), soul.getLocationZ(), ownerStr));
-                }
-            }
-            sender.sendMessage(shownSouls+" souls");
-        } else {
-            // Normal player output
-            final List<@NotNull Soul> souls = soulDatabase.getSoulsByOwnerAndWorld(listAllSouls ? null : senderUUID, ((Player) sender).getWorld().getUID());
-            final Location location = ((Player) sender).getLocation();
-            souls.sort(Comparator.comparingLong(soulAndId -> -soulAndId.getCreationTimestamp()));
-
-            final boolean canFree = sender.hasPermission("com.darkyen.minecraft.deadsouls.souls.free");
-            final boolean canFreeAll = sender.hasPermission("com.darkyen.minecraft.deadsouls.souls.free.all");
-            final boolean canGoto = sender.hasPermission("com.darkyen.minecraft.deadsouls.souls.goto");
-            final boolean canGotoAll = sender.hasPermission("com.darkyen.minecraft.deadsouls.souls.goto.all");
-
-            final int soulsPerPage = 6;
-            final long now = System.currentTimeMillis();
-            for (int i = Math.max(soulsPerPage * number, 0), end = Math.min(i + soulsPerPage, souls.size()); i < end; i++) {
-                final Soul soul = souls.get(i);
-                final float distance = (float) Math.sqrt(distance2(soul, location, 1));
-
-                final TextComponent baseText = new TextComponent((i+1)+" ");
-                baseText.setColor(ChatColor.AQUA);
-                baseText.setBold(true);
-
-                long minutesOld = TimeUnit.MILLISECONDS.toMinutes(now - soul.getCreationTimestamp());
-                if (minutesOld >= 0) {
-                    String age;
-                    if (minutesOld <= 1) {
-                        age = " Fresh";
-                    } else if (minutesOld < 60 * 2) {
-                        age = " " + minutesOld + " minutes old";
-                    } else if (minutesOld < 24 * 60) {
-                        age = " " + (minutesOld / 60) + " hours old";
-                    } else if (minutesOld < 24 * 60 * 100) {
-                        age = " " + (minutesOld / (24 * 60)) + " days old";
-                    } else {
-                        age = " Ancient";
-                    }
-
-                    final TextComponent ageText = new TextComponent(age);
-                    ageText.setColor(ChatColor.WHITE);
-                    ageText.setItalic(true);
-                    baseText.addExtra(ageText);
-                }
-
-                if (sender.hasPermission("com.darkyen.minecraft.deadsouls.coordinates")) {
-                    final TextComponent coords = new TextComponent(String.format(" %d / %d / %d", Math.round(soul.getLocationX()), Math.round(soul.getLocationY()), Math.round(soul.getLocationZ())));
-                    coords.setColor(ChatColor.GRAY);
-                    baseText.addExtra(coords);
-                }
-
-                if (sender.hasPermission("com.darkyen.minecraft.deadsouls.distance")) {
-                    final TextComponent dist = new TextComponent(String.format(" %.1f m", distance));
-                    dist.setColor(ChatColor.AQUA);
-                    baseText.addExtra(dist);
-                }
-
-
-                final boolean ownSoul = soul.isOwnedBy(sender);
-
-                if (soul.getOwner() != null && (canFreeAll || (ownSoul && canFree))) {
-                    final TextComponent freeButton = new TextComponent("Free");
-                    freeButton.setColor(ChatColor.GREEN);
-                    freeButton.setBold(true);
-                    freeButton.setUnderlined(true);
-                    freeButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/souls free "+ soul.getId()));
-                    baseText.addExtra("  ");
-                    baseText.addExtra(freeButton);
-                }
-
-                if (canGotoAll || (ownSoul && canGoto)) {
-                    final TextComponent gotoButton = new TextComponent("Teleport");
-                    gotoButton.setColor(ChatColor.GOLD);
-                    gotoButton.setBold(true);
-                    gotoButton.setUnderlined(true);
-                    gotoButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/souls goto "+ soul.getId()));
-                    baseText.addExtra("  ");
-                    baseText.addExtra(gotoButton);
-                }
-
-                sender.spigot().sendMessage(baseText);
-            }
-
-            final boolean leftArrow = number > 0;
-            final int pages = (souls.size() + soulsPerPage - 1) / soulsPerPage;
-            final boolean rightArrow = number + 1 < pages;
-
-            final TextComponent arrows = new TextComponent();
-            final TextComponent left = new TextComponent(leftArrow ? "<<" : "  ");
-            left.setColor(ChatColor.GRAY);
-            if (leftArrow) {
-                left.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/souls page " + (number - 1)));
-            }
-            arrows.addExtra(left);
-
-            arrows.addExtra(" page "+(number + 1)+"/"+pages+" ");
-
-            final TextComponent right = new TextComponent(rightArrow ? ">>" : "  ");
-            right.setColor(ChatColor.GRAY);
-            if (rightArrow) {
-                right.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/souls page "+(number + 1)));
-            }
-            arrows.addExtra(right);
-            arrows.addExtra(" ("+souls.size()+" souls total)");
-
-            sender.spigot().sendMessage(arrows);
-        }
-
-        return true;
-    }
-
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.MONITOR)
-    public void onWorldLoaded(WorldLoadEvent event) {
-        refreshEnabledWorlds();
-    }
-
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-    public void onPlayerDeath(PlayerDeathEvent event) {
-        final Player player = event.getEntity();
-        if (!player.hasPermission("com.darkyen.minecraft.deadsouls.hassoul")) {
-            return;
-        }
-
-        final World world = player.getWorld();
-        if (!enabledWorlds.contains(world.getUID())) {
-            return;
-        }
-
-        final boolean pvp = player.getKiller() != null && !player.equals(player.getKiller());
-        if (pvp && pvpBehavior == PvPBehavior.DISABLED) {
-            return;
-        }
-
-        final SoulDatabase soulDatabase = this.soulDatabase;
-        if (soulDatabase == null) {
-            getLogger().log(Level.WARNING, "onPlayerDeath: soulDatabase not loaded yet");
-            return;
-        }
-
-        // Actually clearing the drops is deferred to the end of the method:
-        // in case of any bug that causes this method to crash, we don't want to just delete the items
-        boolean clearItemDrops = false;
-        boolean clearXPDrops = false;
-
-        final ItemStack[] soulItems;
-        if (event.getKeepInventory() || !player.hasPermission("com.darkyen.minecraft.deadsouls.hassoul.items")) {
-            // We don't modify drops for this death at all
-            soulItems = NO_ITEM_STACKS;
-        } else {
-            final List<ItemStack> drops = event.getDrops();
-            soulItems = drops.toArray(NO_ITEM_STACKS);
-            clearItemDrops = true;
-        }
-
-        int soulXp;
-        if (event.getKeepLevel() || !player.hasPermission("com.darkyen.minecraft.deadsouls.hassoul.xp")
-                // Required because getKeepLevel is not set when world's KEEP_INVENTORY is set, but it has the same effect
-                // See https://hub.spigotmc.org/jira/browse/SPIGOT-2222
-                || Boolean.TRUE.equals(world.getGameRuleValue(GameRule.KEEP_INVENTORY))) {
-            // We don't modify XP for this death at all
-            soulXp = 0;
-        } else {
-            final int totalExperience = getTotalExperience(player);
-            if (retainedXPPercent >= 0) {
-                soulXp = Math.round(totalExperience * retainedXPPercent);
-            } else {
-                soulXp = retainedXPPerLevel * player.getLevel();
-            }
-            soulXp = Util.clamp(soulXp, 0, totalExperience);
-            clearXPDrops = true;
-        }
-
-        if (soulXp == 0 && soulItems.length == 0) {
-            // Soul would be empty
-            return;
-        }
-
-        Location soulLocation = null;
-        try {
-            if (smartSoulPlacement) {
-                PlayerSoulInfo info = watchedPlayers.get(player);
-                if (info == null) {
-                    getLogger().log(Level.WARNING, "Player " + player + " was not watched!");
-                    info = new PlayerSoulInfo();
-                    watchedPlayers.put(player, info);
-                }
-                soulLocation = info.findSafeSoulSpawnLocation(player);
-                info.lastSafeLocation.setWorld(null); // Reset it, so it isn't used twice
-            } else {
-                soulLocation = PlayerSoulInfo.findFallbackSoulSpawnLocation(player, player.getLocation(), false);
-            }
-        } catch (Exception bugException) {
-            // Should never happen, but just in case!
-            getLogger().log(Level.SEVERE, "Failed to find soul location, defaulting to player location!", bugException);
-        }
-        if (soulLocation == null) {
-            soulLocation = player.getLocation();
-        }
-
-        final UUID owner;
-        if ((pvp && pvpBehavior == PvPBehavior.FREE) || soulFreeAfterMs <= 0) {
-            owner = null;
-        } else {
-            owner = player.getUniqueId();
-        }
-
-        final int soulId = soulDatabase.addSoul(owner, world.getUID(),
-                soulLocation.getX(), soulLocation.getY(), soulLocation.getZ(), soulItems, soulXp).getId();
-        refreshNearbySoulCache = true;
-
-        // Show coordinates if the player has poor taste
-        if (player.hasPermission("com.darkyen.minecraft.deadsouls.coordinates")) {
-            final TextComponent skull = new TextComponent("☠");
-            skull.setColor(ChatColor.BLACK);
-            final TextComponent coords = new TextComponent(String.format(" %d / %d / %d ", Math.round(soulLocation.getX()), Math.round(soulLocation.getY()), Math.round(soulLocation.getZ())));
-            coords.setColor(ChatColor.GRAY);
-            player.spigot().sendMessage(skull, coords, skull);
-        }
-
-        // Do not offer to free the soul if it will be free sooner than the player can click the button
-        if (owner != null && soulFreeAfterMs > 1000
-                && soulFreeingEnabled && textFreeMySoul != null && !textFreeMySoul.isEmpty()
-                && (player.hasPermission("com.darkyen.minecraft.deadsouls.souls.free")
-                    || player.hasPermission("com.darkyen.minecraft.deadsouls.souls.free.all"))) {
-            final TextComponent star = new TextComponent("✦");
-            star.setColor(ChatColor.YELLOW);
-            final TextComponent freeMySoul = new TextComponent(" "+textFreeMySoul+" ");
-            freeMySoul.setColor(ChatColor.GOLD);
-            freeMySoul.setBold(true);
-            freeMySoul.setUnderlined(true);
-            if (textFreeMySoulTooltip != null && !textFreeMySoulTooltip.isEmpty()) {
-                SpigotCompat.textComponentSetHoverText(freeMySoul, textFreeMySoulTooltip);
-            }
-            freeMySoul.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/souls free " + soulId));
-            player.spigot().sendMessage(ChatMessageType.CHAT, star, freeMySoul, star);
-        }
-
-        if (!soundSoulDropped.isEmpty()) {
-            world.playSound(soulLocation, soundSoulDropped, SoundCategory.MASTER, 1.1f, 1.7f);
-        }
-
-        // No need to set setKeepInventory/Level to false, because if we got here, it already is false
-        if (clearItemDrops) {
-            event.getDrops().clear();
-        }
-        if (clearXPDrops) {
-            event.setNewExp(0);
-            event.setNewLevel(0);
-            event.setNewTotalExp(0);
-            event.setDroppedExp(0);
-        }
-    }
-
-    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-    public void onEntityDeath(EntityDeathEvent event) {
-        final LivingEntity entity = event.getEntity();
-
-        if (entity instanceof Player || !animalsWithSouls.contains(entity.getType())) {
-            return;
-        }
-
-        final ItemStack[] soulItems = event.getDrops().toArray(NO_ITEM_STACKS);
-        final int soulXp = event.getDroppedExp();
-
-        if (soulXp == 0 && soulItems.length == 0) {
-            // Soul would be empty
-            return;
-        }
-
-        final SoulDatabase soulDatabase = this.soulDatabase;
-        if (soulDatabase == null) {
-            getLogger().log(Level.WARNING, "onEntityDeath: soulDatabase not loaded yet");
-            return;
-        }
-
-        final Location soulLocation = entity.getLocation();
-
-        final World world = entity.getWorld();
-        soulDatabase.addSoul(null, world.getUID(), soulLocation.getX(), soulLocation.getY(), soulLocation.getZ(), soulItems, soulXp);
-        refreshNearbySoulCache = true;
-
-        if (!soundSoulDropped.isEmpty()) {
-            world.playSound(soulLocation, soundSoulDropped, SoundCategory.MASTER, 1.1f, 1.7f);
-        }
-
-        event.getDrops().clear();
-        event.setDroppedExp(0);
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerJoin(PlayerJoinEvent event) {
-        watchedPlayers.put(event.getPlayer(), new PlayerSoulInfo());
-    }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
-    public void onPlayerLeave(PlayerQuitEvent event) {
-        watchedPlayers.remove(event.getPlayer());
-    }
-
-    private static final class PlayerSoulInfo {
-        static final double SOUL_HOVER_OFFSET = 1.2;
-
-        @NotNull
-        final Location lastKnownLocation = new Location(null, 0, 0, 0);
-
-        @NotNull
-        final Location lastSafeLocation = new Location(null, 0, 0, 0);
-
-        final ArrayList<Soul> visibleSouls = new ArrayList<>();
-
-        @NotNull
-        Location findSafeSoulSpawnLocation(@NotNull Player player) {
-            final Location playerLocation = player.getLocation();
-            if (isNear(lastSafeLocation, playerLocation, 20)) {
-                set(playerLocation, lastSafeLocation);
-                playerLocation.setY(playerLocation.getY() + SOUL_HOVER_OFFSET);
-                return playerLocation;
-            }
-
-            // Too far, now we have to find a better location
-            return findFallbackSoulSpawnLocation(player, playerLocation, true);
-        }
-
-        @NotNull
-        static Location findFallbackSoulSpawnLocation(@NotNull Player player, @NotNull Location playerLocation, boolean improve) {
-            final World world = player.getWorld();
-
-            final int x = playerLocation.getBlockX();
-            int y = Util.clamp(playerLocation.getBlockY(), SpigotCompat.worldGetMinHeight(world), world.getMaxHeight());
-            final int z = playerLocation.getBlockZ();
-
-            if (improve) {
-                int yOff = 0;
-                while (true) {
-                    final Material type = world.getBlockAt(x, y + yOff, z).getType();
-                    if (type.isSolid()) {
-                        // Soul either started in a block or ended in it, do not want
-                        yOff = 0;
-                        break;
-                    } else if (type == Material.LAVA) {
-                        yOff++;
-
-                        if (yOff > 8) {
-                            // Probably dead in a lava column, we don't want to push it up
-                            yOff = 0;
-                            break;
-                        }
-                        // continue
-                    } else {
-                        // This place looks good
-                        break;
-                    }
-                }
-
-                y += yOff;
-            }
-
-            playerLocation.setY(y + SOUL_HOVER_OFFSET);
-            return playerLocation;
-        }
-    }
-
-    private static final class ComparatorSoulDistanceTo implements Comparator<Soul> {
-
-        double toX, toY, toZ;
-
-        private double distanceTo(@NotNull Soul s) {
-            final double x = toX - s.getLocationX();
-            final double y = toY - s.getLocationY();
-            final double z = toZ - s.getLocationZ();
-            return x*x + y*y + z*z;
-        }
-
-        @Override
-        public int compare(@NotNull Soul o1, @NotNull Soul o2) {
-            return Double.compare(distanceTo(o1), distanceTo(o2));
-        }
-    }
-
-    private enum PvPBehavior {
-        /** no change */
-        NORMAL,
-        /** souls are not created in PvP, items and XP drops like in vanilla Minecraft */
-        DISABLED,
-        /** created souls are immediately free and can be collected by anyone */
-        FREE
-    }
-
-    //region API Methods
-
-
-    //endregion
 }
