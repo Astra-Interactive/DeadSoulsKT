@@ -1,5 +1,4 @@
 pluginManagement {
-    includeBuild("build-logic")
     repositories {
         maven("https://maven.fabricmc.net/") { name = "Fabric" }
         maven("https://repo.papermc.io/repository/maven-public/")
@@ -46,7 +45,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "DeadSoulsKT"
-
 
 // Spigot
 include("plugin")

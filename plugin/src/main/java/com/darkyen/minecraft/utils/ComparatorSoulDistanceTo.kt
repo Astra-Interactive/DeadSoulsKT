@@ -2,7 +2,6 @@ package com.darkyen.minecraft.utils
 
 import com.darkyen.minecraft.models.Soul
 
-
 class ComparatorSoulDistanceTo(
     private val toX: Double,
     private val toY: Double,

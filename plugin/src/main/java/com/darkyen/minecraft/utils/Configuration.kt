@@ -17,9 +17,12 @@ class Configuration(fileConfiguration: FileConfiguration) {
     val volumeSoulCalling = fileConfiguration.cFloat("volume-soul-calling", 16f)
 
     val textFreeMySoul = fileConfiguration.cString("text-free-my-soul", "Free my soul")
-    val textFreeMySoulTooltip = fileConfiguration.cString("text-free-my-soul-tooltip", "Allows other players to collect the soul immediately")
+    val textFreeMySoulTooltip = fileConfiguration.cString(
+        "text-free-my-soul-tooltip",
+        "Allows other players to collect the soul immediately"
+    )
     val soulFreeingEnabled: Boolean
-        get() = textFreeMySoul.value.isNotEmpty();
+        get() = !textFreeMySoul.value.isNullOrEmpty()
 
     val smartSoulPlacement = fileConfiguration.cBoolean("smart-soul-placement", true)
 
@@ -27,7 +30,3 @@ class Configuration(fileConfiguration: FileConfiguration) {
     val soulDustOptionsXp = fileConfiguration.cDustOptions("color-soul-xp", Color.AQUA, 2f)
     val soulDustOptionsGone = fileConfiguration.cDustOptions("color-soul-gone", Color.YELLOW, 3f)
 }
-
-
-
-

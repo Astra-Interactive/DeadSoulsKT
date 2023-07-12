@@ -1,17 +1,16 @@
 package com.darkyen.minecraft;
 
 import com.darkyen.minecraft.utils.Util;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 /**
  *
  */
-class ExpTest {
+public final class ExpTest {
 
     @Test
-    void expTest() {
+    public void expTest() {
         int total = 0;
         for (int level = 0; level < 100; level++) {
             total += Util.getExpToLevel(level);

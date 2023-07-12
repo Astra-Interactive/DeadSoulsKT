@@ -1,6 +1,5 @@
 package com.darkyen.minecraft;
 
-import be.seeseemelk.mockbukkit.ServerMock;
 import com.darkyen.minecraft.models.Soul;
 import com.darkyen.minecraft.database.SoulDatabase;
 import com.darkyen.minecraft.mock.ServerStub;
@@ -12,41 +11,41 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.UUID;
+import org.junit.After;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  *
  */
-public class SoulDatabaseTest {
-	private static ServerMock server;
-	private static DeadSouls plugin;
+public final class SoulDatabaseTest {
+    //	private static ServerMock server;
+    private static DeadSouls plugin;
 
-    @BeforeAll
-    static void setup() {
+    @Before
+    public void setup() {
 //		server = MockBukkit.mock();
 //		plugin = MockBukkit.load(DeadSouls.class);
         Bukkit.setServer(new ServerStub() {
         });
     }
 
-    @AfterAll
-    public static void tearDown() {
+    @After
+    public void tearDown() {
 //		MockBukkit.unmock();
     }
 
     @Test
-    void brokenItemTest() throws IOException, Serialization.Exception {
+    public void brokenItemTest() throws IOException, Serialization.Exception {
         final ItemStack goodItem1 = new ItemStack(Material.DIRT, 5);
         final ItemStack goodItem2 = new ItemStack(Material.COBBLESTONE, 50);
 
@@ -63,7 +62,7 @@ public class SoulDatabaseTest {
 
         final ByteBufferChannel byteBufferChannel = new ByteBufferChannel();
         try (DataOutputChannel channel = new DataOutputChannel(byteBufferChannel)) {
-            Assertions.assertTrue(SoulDatabase.serializeSoul(soul, channel));
+            assertTrue(SoulDatabase.serializeSoul(soul, channel));
         }
         byteBufferChannel.position(0L);
 
@@ -71,9 +70,9 @@ public class SoulDatabaseTest {
 
         assertEquals(soul.getOwner(), deserializedSoul.getOwner());
         assertEquals(soul.getWorld(), deserializedSoul.getWorld());
-        assertEquals(soul.getLocationX(), deserializedSoul.getLocationX());
-        assertEquals(soul.getLocationY(), deserializedSoul.getLocationY());
-        assertEquals(soul.getLocationZ(), deserializedSoul.getLocationZ());
+        assertEquals(soul.getLocationX(), deserializedSoul.getLocationX(), 0.0000001);
+        assertEquals(soul.getLocationY(), deserializedSoul.getLocationY(), 0.0000001);
+        assertEquals(soul.getLocationZ(), deserializedSoul.getLocationZ(), 0.0000001);
         assertEquals(soul.getExperiencePoints(), deserializedSoul.getExperiencePoints());
         assertEquals(soul.getCreationTimestamp(), deserializedSoul.getCreationTimestamp());
         System.out.println(Arrays.toString(goodItems));

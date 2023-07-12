@@ -25,15 +25,15 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import ru.astrainteractive.astralibs.events.EventListener;
-import ru.astrainteractive.astralibs.events.EventManager;
 
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
-import static com.darkyen.minecraft.di.Modules.getPluginConfig;
+import static com.darkyen.minecraft.di.RootModule.getPluginConfig;
 import static com.darkyen.minecraft.api.DeadSoulsAPIImpl.NO_ITEM_STACKS;
 import static com.darkyen.minecraft.utils.Util.getTotalExperience;
 
@@ -160,7 +160,7 @@ public class SoulsEventListener implements EventListener {
                 || player.hasPermission("com.darkyen.minecraft.deadsouls.souls.free.all"))) {
             final TextComponent star = new TextComponent("✦");
             star.setColor(ChatColor.YELLOW);
-            final TextComponent freeMySoul = new TextComponent(" "+getPluginConfig().getTextFreeMySoul().getValue()+" ");
+            final TextComponent freeMySoul = new TextComponent(" " + getPluginConfig().getTextFreeMySoul().getValue() + " ");
             freeMySoul.setColor(ChatColor.GOLD);
             freeMySoul.setBold(true);
             freeMySoul.setUnderlined(true);
@@ -239,11 +239,8 @@ public class SoulsEventListener implements EventListener {
         HandlerList.unregisterAll(this);
     }
 
-    @NotNull
     @Override
-    public EventListener onEnable(@NotNull EventManager eventManager) {
+    public void onEnable(@NotNull Plugin plugin) {
         instance.getServer().getPluginManager().registerEvents(this, instance);
-        eventManager.addHandler(this);
-        return this;
     }
 }

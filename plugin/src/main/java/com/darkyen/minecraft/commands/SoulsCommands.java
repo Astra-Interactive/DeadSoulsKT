@@ -24,7 +24,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
-import static com.darkyen.minecraft.di.Modules.getPluginConfig;
+import static com.darkyen.minecraft.di.RootModule.getPluginConfig;
 import static com.darkyen.minecraft.utils.Util.distance2;
 
 public class SoulsCommands implements CommandExecutor {

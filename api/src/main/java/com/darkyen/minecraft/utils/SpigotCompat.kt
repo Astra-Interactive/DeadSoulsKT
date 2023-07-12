@@ -14,11 +14,10 @@ object SpigotCompat {
         world.minHeight
     }.getOrNull() ?: 0
 
-
     /** Set the hover event to text.  */
     @Suppress("deprecation")
     @JvmStatic
-    fun textComponentSetHoverText(textComponent: TextComponent, tooltip: String?){
+    fun textComponentSetHoverText(textComponent: TextComponent, tooltip: String?) {
         kotlin.runCatching {
             textComponent.hoverEvent = HoverEvent(HoverEvent.Action.SHOW_TEXT, Text(tooltip))
         }.onFailure {

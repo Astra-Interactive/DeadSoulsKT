@@ -25,6 +25,7 @@ class SoulPickupEvent(
 
     companion object {
         val HANDLERS = HandlerList()
+
         @JvmStatic
         fun getHandlerList(): HandlerList = HANDLERS
     }
