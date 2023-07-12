@@ -2,27 +2,25 @@ package com.darkyen.minecraft;
 
 import com.darkyen.minecraft.database.SpatialDatabase;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.function.IntToLongFunction;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 
 /**
  *
  */
-class SpatialDatabaseTest {
+public final class SpatialDatabaseTest {
 
     @Test
-    void keyTest() {
+    public void keyTest() {
         assertTrue(SpatialDatabase.key(0, 0) < SpatialDatabase.key(0, 1));
         assertTrue(SpatialDatabase.key(0, 0) < SpatialDatabase.key(1, 1));
         assertTrue(SpatialDatabase.key(0, 0) < SpatialDatabase.key(1, 0));
@@ -45,7 +43,7 @@ class SpatialDatabaseTest {
     }
 
     @Test
-    void simple() {
+    public void simple() {
         final SpatialDatabase<SpatialEntry> db = new SpatialDatabase<>();
         final SpatialEntry entry12a = new SpatialEntry(1, 2, "1.2a");
         final SpatialEntry entry12b = new SpatialEntry(1, 2, "1.2b");
@@ -73,8 +71,8 @@ class SpatialDatabaseTest {
     }
 
     @Test
-    void stress() {
-        final int mask = (1 << 4)-1;//(1 << 13) - 1;
+    public void stress() {
+        final int mask = (1 << 4) - 1;//(1 << 13) - 1;
         final int offset = 0;//(1 << 12);
         final SpatialDatabase<SpatialEntry> db = new SpatialDatabase<>();
         final Random random = new Random();
@@ -85,8 +83,8 @@ class SpatialDatabaseTest {
             if (random.nextInt(3) == 0 && !backing.isEmpty()) {
                 // Remove something
                 final SpatialEntry toRemove = backing.remove(random.nextInt(backing.size()));
-                assertTrue(db.remove(toRemove), "Iteration: "+i+" #="+backing.size());
-                assertFalse(db.remove(toRemove), "Iteration: "+i+" #="+backing.size());
+                assertTrue("Iteration: " + i + " #=" + backing.size(), db.remove(toRemove));
+                assertFalse("Iteration: " + i + " #=" + backing.size(), db.remove(toRemove));
             } else {
                 // Add something
                 final SpatialEntry entry = new SpatialEntry((random.nextInt() & mask) - offset, (random.nextInt() & mask) - offset, Integer.toString(i));
@@ -140,7 +138,7 @@ class SpatialDatabaseTest {
             backing.add(new SpatialEntry(random.nextInt() & mask, random.nextInt() & mask, null));
         }
 
-        for (int i = 0; i < iterations*2; i++) {
+        for (int i = 0; i < iterations * 2; i++) {
             final int xMin = (random.nextInt() & mask);
             final int yMin = (random.nextInt() & mask);
             final int xMax = xMin + random.nextInt(4);
@@ -173,7 +171,7 @@ class SpatialDatabaseTest {
         }
 
         final ArrayList<SpatialEntry> query = new ArrayList<>();
-        for (int i = 0; i < iterations*2; i++) {
+        for (int i = 0; i < iterations * 2; i++) {
             final int xMin = (random.nextInt() & mask);
             final int yMin = (random.nextInt() & mask);
             final int xMax = xMin + random.nextInt(4);
@@ -197,14 +195,13 @@ class SpatialDatabaseTest {
             result += runnable.applyAsLong(i);
         }
         final long total = System.nanoTime() - start;
-        System.out.println(label+": "+(total / iterations)+"ns   "+result);
+        System.out.println(label + ": " + (total / iterations) + "ns   " + result);
     }
 
     private static final int BENCHMARK_MASK = (1 << 14) - 1;
 
-    @Disabled
     @Test
-    void benchmark() {
+    public void benchmark() {
         measure("ArrayList", i -> benchmarkArrayList(i, 200, BENCHMARK_MASK));
         measure("SpatialDatabase", i -> benchmarkSpatialDatabase(i, 200, BENCHMARK_MASK));
     }

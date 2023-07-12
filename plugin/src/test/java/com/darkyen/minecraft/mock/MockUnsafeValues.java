@@ -27,6 +27,7 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import org.jetbrains.annotations.Nullable;
 
 public class MockUnsafeValues implements UnsafeValues {
 
@@ -147,12 +148,17 @@ public class MockUnsafeValues implements UnsafeValues {
     }
 
     @Override
-    public String getTimingsServerName() {
+    public String getBlockTranslationKey(Material material) {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
     @Override
-    public boolean isSupportedApiVersion(String apiVersion) {
+    public String getItemTranslationKey(Material material) {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    @Override
+    public String getTimingsServerName() {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
@@ -177,16 +183,6 @@ public class MockUnsafeValues implements UnsafeValues {
     }
 
     @Override
-    public String getTranslationKey(Material mat) {
-        throw new UnsupportedOperationException("Method not implemented");
-    }
-
-    @Override
-    public String getTranslationKey(Block block) {
-        throw new UnsupportedOperationException("Method not implemented");
-    }
-
-    @Override
     public String getTranslationKey(EntityType type) {
         throw new UnsupportedOperationException("Method not implemented");
     }
@@ -197,12 +193,17 @@ public class MockUnsafeValues implements UnsafeValues {
     }
 
     @Override
-    public int nextEntityId() {
-        throw new UnsupportedOperationException("Method not implemented");
+    public @Nullable FeatureFlag getFeatureFlag(@NotNull NamespacedKey key) {
+        return null;
     }
 
     @Override
-    public @NotNull <T extends Keyed> Registry<T> registryFor(Class<T> classOfT) {
+    public boolean isSupportedApiVersion(String apiVersion) {
+        return false;
+    }
+
+    @Override
+    public int nextEntityId() {
         throw new UnsupportedOperationException("Method not implemented");
     }
 

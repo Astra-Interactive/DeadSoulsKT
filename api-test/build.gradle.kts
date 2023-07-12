@@ -1,33 +1,20 @@
 plugins {
-    id("spigot-resource-processor")
-    id("spigot-shadow")
-    id("basic-java")
+    kotlin("jvm")
 }
 
 dependencies {
     // Kotlin
-    implementation(libs.kotlinGradlePlugin)
-    // Coroutines
-    implementation(libs.coroutines.coreJvm)
-    implementation(libs.coroutines.core)
-    // Serialization
-    implementation(libs.kotlin.serialization)
-    implementation(libs.kotlin.serializationJson)
-    implementation(libs.kotlin.serializationKaml)
+    implementation(libs.bundles.kotlin)
     // AstraLibs
-    implementation(libs.astralibs.ktxCore)
-    implementation(libs.astralibs.spigotCore)
-    implementation(libs.bstats.bukkit)
-    implementation(project(mapOf("path" to ":api")))
-    // Test
-//    testImplementation(kotlin("test"))
-//    testImplementation(libs.orgTesting)
+    implementation(libs.minecraft.astralibs.ktxcore)
+    implementation(libs.minecraft.astralibs.orm)
+    implementation(libs.minecraft.astralibs.di)
+    implementation(libs.minecraft.astralibs.spigot.gui)
+    implementation(libs.minecraft.astralibs.spigot.core)
     // Spigot dependencies
-    compileOnly(libs.essentialsx)
-    compileOnly(libs.paperApi)
-    compileOnly(libs.spigotApi)
-    compileOnly(libs.spigot)
+    compileOnly(libs.minecraft.paper.api)
     // Local
+    implementation(project(mapOf("path" to ":api")))
     implementation(project(":plugin"))
     implementation(project(":api"))
 }

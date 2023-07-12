@@ -5,11 +5,7 @@ import com.darkyen.minecraft.utils.channels.DataInputChannel;
 import com.darkyen.minecraft.utils.channels.DataOutputChannel;
 import com.darkyen.minecraft.utils.serialization.Serialization;
 import com.darkyen.minecraft.utils.serialization.SerializedType;
-import org.bukkit.configuration.serialization.ConfigurationSerializable;
-import org.bukkit.configuration.serialization.ConfigurationSerialization;
-import org.bukkit.configuration.serialization.SerializableAs;
 import org.jetbrains.annotations.NotNull;
-import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -19,10 +15,15 @@ import java.util.Map;
 import java.util.Random;
 
 import static com.darkyen.minecraft.utils.serialization.SerializedType.*;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.bukkit.configuration.serialization.SerializableAs;
 
 /**
  *
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public final class DataChannelTest {
 
     @Test
-    void primitives() throws IOException {
+    public void primitives() throws IOException {
         final ByteBufferChannel byteChn = new ByteBufferChannel();
 
         StringBuilder largeStringBuilder = new StringBuilder();
@@ -40,7 +41,7 @@ public final class DataChannelTest {
         // Large string to trigger slow path by being longer than output and input buffer
         String largeString = largeStringBuilder.toString();
 
-        try (DataOutputChannel out = new DataOutputChannel(byteChn, 128)){
+        try (DataOutputChannel out = new DataOutputChannel(byteChn, 128)) {
             out.writeBoolean(true);
             out.writeBoolean(false);
             out.writeByte(1);
@@ -81,17 +82,17 @@ public final class DataChannelTest {
             assertEquals(Integer.MAX_VALUE, in.readInt());
             assertEquals(Long.MIN_VALUE, in.readLong());
             assertEquals(123456789012345L, in.readLong());
-            assertEquals(1234f, in.readFloat());
-            assertEquals(1234.0, in.readDouble());
+            assertEquals(1234f, in.readFloat(),0.00000001f);
+            assertEquals(1234.0, in.readDouble(),0.00000001);
             assertEquals(largeString, in.readUTF());
         }
     }
 
     @Test
-    void string() throws IOException {
+    public void string() throws IOException {
         final ByteBufferChannel byteChn = new ByteBufferChannel();
 
-        try (DataOutputChannel out = new DataOutputChannel(byteChn)){
+        try (DataOutputChannel out = new DataOutputChannel(byteChn)) {
             out.writeChars("123");
             out.writeBytes("123");
             out.writeUTF("123");
@@ -111,11 +112,11 @@ public final class DataChannelTest {
     }
 
     @Test
-    void byteStressTest() throws IOException {
-        final int repeats = 1<<20;
+    public void byteStressTest() throws IOException {
+        final int repeats = 1 << 20;
         final ByteBufferChannel byteChn = new ByteBufferChannel(repeats);
 
-        try (DataOutputChannel out = new DataOutputChannel(byteChn)){
+        try (DataOutputChannel out = new DataOutputChannel(byteChn)) {
             for (int i = 0; i < repeats; i++) {
                 out.writeByte(i);
             }
@@ -125,17 +126,17 @@ public final class DataChannelTest {
 
         try (DataInputChannel in = new DataInputChannel(byteChn)) {
             for (int i = 0; i < repeats; i++) {
-                assertEquals((byte)i, in.readByte());
+                assertEquals((byte) i, in.readByte());
             }
         }
     }
 
     @Test
-    void longStressTest() throws IOException {
-        final int repeats = 1<<20;
+    public void longStressTest() throws IOException {
+        final int repeats = 1 << 20;
         final ByteBufferChannel byteChn = new ByteBufferChannel(repeats * 8);
 
-        try (DataOutputChannel out = new DataOutputChannel(byteChn)){
+        try (DataOutputChannel out = new DataOutputChannel(byteChn)) {
             for (int i = 0; i < repeats; i++) {
                 out.writeLong(i);
             }
@@ -151,15 +152,15 @@ public final class DataChannelTest {
     }
 
     @Test
-    void bytesStressTest() throws IOException {
-        final int repeats = 1<<20;
+    public void bytesStressTest() throws IOException {
+        final int repeats = 1 << 20;
         final byte[] bytes = new byte[13];
         for (int i = 0; i < bytes.length; i++) {
-            bytes[i] = (byte)i;
+            bytes[i] = (byte) i;
         }
         final ByteBufferChannel byteChn = new ByteBufferChannel(repeats * bytes.length);
 
-        try (DataOutputChannel out = new DataOutputChannel(byteChn)){
+        try (DataOutputChannel out = new DataOutputChannel(byteChn)) {
             for (int i = 0; i < repeats; i++) {
                 out.write(bytes);
             }
@@ -177,12 +178,12 @@ public final class DataChannelTest {
     }
 
     @Test
-    void utfStressTest() throws IOException {
-        final int repeats = 1<<8;
+    public void utfStressTest() throws IOException {
+        final int repeats = 1 << 8;
         final String utf = "1234567890ABC";
         final ByteBufferChannel byteChn = new ByteBufferChannel(repeats * (utf.length() + 2));
 
-        try (DataOutputChannel out = new DataOutputChannel(byteChn, 64)){
+        try (DataOutputChannel out = new DataOutputChannel(byteChn, 64)) {
             for (int i = 0; i < repeats; i++) {
                 out.writeUTF(utf);
             }
@@ -198,11 +199,11 @@ public final class DataChannelTest {
     }
 
     @Test
-    void stressTest() throws IOException {
+    public void stressTest() throws IOException {
         final int repeats = 1 << 20;
         final ByteBufferChannel byteChn = new ByteBufferChannel(repeats * 57);
 
-        try (DataOutputChannel out = new DataOutputChannel(byteChn)){
+        try (DataOutputChannel out = new DataOutputChannel(byteChn)) {
             for (int i = 0; i < repeats; i++) {
                 out.writeBoolean(true);
                 out.writeBoolean(false);
@@ -245,20 +246,20 @@ public final class DataChannelTest {
                 assertEquals(Integer.MAX_VALUE, in.readInt());
                 assertEquals(Long.MIN_VALUE, in.readLong());
                 assertEquals(123456789012345L, in.readLong());
-                assertEquals(1234f, in.readFloat());
-                assertEquals(1234.0, in.readDouble());
+                assertEquals(1234f, in.readFloat(),0.00000001f);
+                assertEquals(1234.0, in.readDouble(),0.00000001);
             }
         }
     }
 
     @Test
-    void positions() throws IOException {
+    public void positions() throws IOException {
         final int repeats = 1 << 20;
         final int blockSize = 100;
         final ByteBufferChannel byteChn = new ByteBufferChannel(repeats * blockSize);
 
 
-        try (DataOutputChannel out = new DataOutputChannel(byteChn)){
+        try (DataOutputChannel out = new DataOutputChannel(byteChn)) {
             final byte[] zeroBlock = new byte[blockSize];
 
             for (int i = 0; i < repeats; i++) {
@@ -335,11 +336,11 @@ public final class DataChannelTest {
             case PRIMITIVE_BOOLEAN_FALSE:
                 return false;
             case PRIMITIVE_BYTE:
-                return (byte)random.nextInt();
+                return (byte) random.nextInt();
             case PRIMITIVE_CHARACTER:
-                return (char)random.nextInt();
+                return (char) random.nextInt();
             case PRIMITIVE_SHORT:
-                return (short)random.nextInt();
+                return (short) random.nextInt();
             case PRIMITIVE_INT:
                 return random.nextInt();
             case PRIMITIVE_LONG:
@@ -352,7 +353,7 @@ public final class DataChannelTest {
                 final int length = random.nextInt(500);
                 char[] characters = new char[length];
                 for (int i = 0; i < length; i++) {
-                    characters[i] = (char)random.nextInt();
+                    characters[i] = (char) random.nextInt();
                 }
                 return new String(characters);
             }
@@ -370,7 +371,7 @@ public final class DataChannelTest {
                 final int length = type == MAP_BYTE ? random.nextInt(256) : 256 + random.nextInt(10);
                 final HashMap<String, Object> resultMap = new HashMap<>();
                 for (int i = 0; i < length; i++) {
-                    resultMap.put("KEY:"+i, generateObject(branchChance * 0.3f));
+                    resultMap.put("KEY:" + i, generateObject(branchChance * 0.3f));
                 }
                 return resultMap;
             }
@@ -379,7 +380,7 @@ public final class DataChannelTest {
                 final int length = type == CONFIGURATION_SERIALIZABLE_BYTE ? random.nextInt(256) : 256 + random.nextInt(10);
                 final HashMap<String, Object> resultMap = new HashMap<>();
                 for (int i = 0; i < length; i++) {
-                    resultMap.put("KEY:"+i, generateObject(branchChance * 0.3f));
+                    resultMap.put("KEY:" + i, generateObject(branchChance * 0.3f));
                 }
                 return new TestConfigurationSerializable(resultMap);
             }
@@ -430,12 +431,12 @@ public final class DataChannelTest {
     }
 
     @Test
-    void objectStressTest() throws IOException, Serialization.Exception {
+    public void objectStressTest() throws IOException, Serialization.Exception {
         final int capacity = 1 << 27;
         final ByteBufferChannel byteChn = new ByteBufferChannel(capacity);
         final ArrayList<Object> objects = new ArrayList<>();
 
-        try (DataOutputChannel out = new DataOutputChannel(byteChn)){
+        try (DataOutputChannel out = new DataOutputChannel(byteChn)) {
             long maxObjectSize = 0;
             int removed = 0;
             while (out.position() + maxObjectSize * 2 < capacity) {
@@ -456,7 +457,7 @@ public final class DataChannelTest {
                     removed++;
                 }
             }
-            System.out.println("Generated "+objects.size()+" objects, total size "+out.position()+", removed "+ removed);
+            System.out.println("Generated " + objects.size() + " objects, total size " + out.position() + ", removed " + removed);
         }
 
 
@@ -472,39 +473,39 @@ public final class DataChannelTest {
         }
     }
 
-    private static void assertDeepEquals(Object expected, Object received, String prefix) {
+    public static void assertDeepEquals(Object expected, Object received, String prefix) {
         if (expected == received) {
             return;
         }
         if (expected instanceof List) {
-            assertTrue(received instanceof List, prefix);
+            assertTrue(prefix, received instanceof List);
             final List expList = (List) expected;
             final List recList = (List) received;
             final int size = expList.size();
-            assertEquals(size, recList.size(), prefix+".size");
+            assertEquals(prefix + ".size", size, recList.size());
 
             for (int i = 0; i < size; i++) {
-                assertDeepEquals(expList.get(i), recList.get(i), prefix+"["+i+"]");
+                assertDeepEquals(expList.get(i), recList.get(i), prefix + "[" + i + "]");
             }
         } else if (expected instanceof Map) {
-            assertTrue(received instanceof Map, prefix);
+            assertTrue(prefix, received instanceof Map);
             //noinspection unchecked
-            final Map<String, Object> expMap = (Map<String,Object>) expected;
+            final Map<String, Object> expMap = (Map<String, Object>) expected;
             //noinspection unchecked
             final Map<String, Object> recMap = (Map<String, Object>) received;
 
             for (Map.Entry<String, Object> entry : expMap.entrySet()) {
-                assertTrue(recMap.containsKey(entry.getKey()), prefix+".contains("+entry.getKey()+")");
-                assertDeepEquals(entry.getValue(), recMap.get(entry.getKey()), prefix+".get("+entry.getKey()+")");
+                assertTrue(prefix + ".contains(" + entry.getKey() + ")", recMap.containsKey(entry.getKey()));
+                assertDeepEquals(entry.getValue(), recMap.get(entry.getKey()), prefix + ".get(" + entry.getKey() + ")");
             }
         } else if (expected instanceof TestConfigurationSerializable) {
-            assertTrue(received instanceof TestConfigurationSerializable, prefix);
+            assertTrue(prefix, received instanceof TestConfigurationSerializable);
             final TestConfigurationSerializable expConfSer = (TestConfigurationSerializable) expected;
             final TestConfigurationSerializable recConfSer = (TestConfigurationSerializable) received;
 
-            assertDeepEquals(expConfSer.value, recConfSer.value, "((ConfSer)"+prefix+").value");
+            assertDeepEquals(expConfSer.value, recConfSer.value, "((ConfSer)" + prefix + ").value");
         } else {
-            assertEquals(expected, received, prefix);
+            assertEquals(prefix, expected, received);
         }
     }
 }

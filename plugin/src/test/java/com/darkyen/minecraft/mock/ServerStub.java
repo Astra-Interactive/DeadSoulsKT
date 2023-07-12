@@ -4,6 +4,11 @@ import com.destroystokyo.paper.entity.ai.MobGoals;
 import com.google.common.collect.Multimap;
 import io.papermc.paper.datapack.DatapackManager;
 import io.papermc.paper.inventory.ItemRarity;
+import io.papermc.paper.math.Position;
+import io.papermc.paper.threadedregions.scheduler.AsyncScheduler;
+import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler;
+import io.papermc.paper.threadedregions.scheduler.RegionScheduler;
+import java.net.InetAddress;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -35,6 +40,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.LootTable;
 import org.bukkit.map.MapView;
 import org.bukkit.material.MaterialData;
+import org.bukkit.packs.DataPackManager;
 import org.bukkit.plugin.*;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.potion.PotionBrewer;
@@ -138,6 +144,21 @@ public class ServerStub implements Server {
 
 	@Override
 	public boolean getAllowNether() {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public @NotNull List<String> getInitialEnabledPacks() {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public @NotNull List<String> getInitialDisabledPacks() {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public @NotNull DataPackManager getDataPackManager() {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 
@@ -548,6 +569,16 @@ public class ServerStub implements Server {
 	}
 
 	@Override
+	public void banIP(@NotNull InetAddress address) {
+
+	}
+
+	@Override
+	public void unbanIP(@NotNull InetAddress address) {
+
+	}
+
+	@Override
 	public @NotNull Set<OfflinePlayer> getBannedPlayers() {
 		throw new UnsupportedOperationException("Method not implemented");
 //		return Collections.emptySet();
@@ -698,8 +729,18 @@ public class ServerStub implements Server {
 	}
 
 	@Override
+	public void motd(@NotNull Component motd) {
+
+	}
+
+	@Override
 	public @NotNull String getMotd() {
 		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public void setMotd(@NotNull String motd) {
+
 	}
 
 	@Override
@@ -963,6 +1004,56 @@ public class ServerStub implements Server {
 	@Override
 	public @NotNull PotionBrewer getPotionBrewer() {
 		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public @NotNull RegionScheduler getRegionScheduler() {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public @NotNull AsyncScheduler getAsyncScheduler() {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public @NotNull GlobalRegionScheduler getGlobalRegionScheduler() {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public boolean isOwnedByCurrentRegion(@NotNull World world, @NotNull Position position) {
+		return false;
+	}
+
+	@Override
+	public boolean isOwnedByCurrentRegion(@NotNull World world, @NotNull Position position, int squareRadiusChunks) {
+		return false;
+	}
+
+	@Override
+	public boolean isOwnedByCurrentRegion(@NotNull Location location) {
+		return false;
+	}
+
+	@Override
+	public boolean isOwnedByCurrentRegion(@NotNull Location location, int squareRadiusChunks) {
+		return false;
+	}
+
+	@Override
+	public boolean isOwnedByCurrentRegion(@NotNull World world, int chunkX, int chunkZ) {
+		return false;
+	}
+
+	@Override
+	public boolean isOwnedByCurrentRegion(@NotNull World world, int chunkX, int chunkZ, int squareRadiusChunks) {
+		return false;
+	}
+
+	@Override
+	public boolean isOwnedByCurrentRegion(@NotNull Entity entity) {
+		return false;
 	}
 
 	@Override

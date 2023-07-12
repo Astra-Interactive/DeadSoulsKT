@@ -4,7 +4,7 @@ import com.darkyen.minecraft.api.DeadSoulsAPI;
 import com.darkyen.minecraft.api.DeadSoulsAPIImpl;
 import com.darkyen.minecraft.commands.SoulsCommands;
 import com.darkyen.minecraft.database.SoulDatabase;
-import com.darkyen.minecraft.di.Modules;
+import com.darkyen.minecraft.di.RootModule;
 import com.darkyen.minecraft.events.SoulPickupEvent;
 import com.darkyen.minecraft.events.SoulsEventListener;
 import com.darkyen.minecraft.models.Soul;
@@ -23,8 +23,6 @@ import org.bukkit.plugin.java.JavaPluginLoader;
 import org.bukkit.util.NumberConversions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import ru.astrainteractive.astralibs.AstraLibs;
-import ru.astrainteractive.astralibs.events.GlobalEventManager;
 
 import java.io.File;
 import java.lang.reflect.Method;
@@ -35,24 +33,26 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import static com.darkyen.minecraft.di.Modules.getPluginConfig;
+import static com.darkyen.minecraft.di.RootModule.getPluginConfig;
 import static com.darkyen.minecraft.api.DeadSoulsAPIImpl.NO_ITEM_STACKS;
 import static com.darkyen.minecraft.utils.Util.*;
+import ru.astrainteractive.astralibs.events.GlobalEventListener;
 
 /**
  *
  */
 public final class DeadSouls extends JavaPlugin {
     // Need for MockBukkit testing
-    public DeadSouls()
-    {
+    public DeadSouls() {
         super();
+        RootModule.getPlugin().initialize(this);
     }
+
     // Need for MockBukkit testing
-    protected DeadSouls(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file)
-    {
+    protected DeadSouls(JavaPluginLoader loader, PluginDescriptionFile description, File dataFolder, File file) {
         super(loader, description, dataFolder, file);
     }
+
     @Nullable
     public SoulDatabase soulDatabase;
 
@@ -84,6 +84,7 @@ public final class DeadSouls extends JavaPlugin {
     private long processPlayers_nextFadeCheck = 0;
     private long processPlayers_nextAutoSave = 0;
     public DeadSoulsAPI api;
+
     private void processPlayers() {
         final SoulDatabase soulDatabase = this.soulDatabase;
         if (soulDatabase == null) {
@@ -98,7 +99,7 @@ public final class DeadSouls extends JavaPlugin {
             final int faded = soulDatabase.removeFadedSouls(getPluginConfig().getSoulFadesAfterMs().getValue());
             if (faded > 0) {
                 this.refreshNearbySoulCache = true;
-                getLogger().log(Level.FINE, "Removed "+faded+" faded soul(s)");
+                getLogger().log(Level.FINE, "Removed " + faded + " faded soul(s)");
             }
             processPlayers_nextFadeCheck = now + 1000 * 60 * 5;// Check every 5 minutes
         }
@@ -150,7 +151,7 @@ public final class DeadSouls extends JavaPlugin {
             }
 
             { // Sort souls
-                final ComparatorSoulDistanceTo comparator = new ComparatorSoulDistanceTo(playerLocation.getX(),playerLocation.getY(),playerLocation.getZ());
+                final ComparatorSoulDistanceTo comparator = new ComparatorSoulDistanceTo(playerLocation.getX(), playerLocation.getY(), playerLocation.getZ());
                 visibleSouls.sort(comparator);
             }
 
@@ -279,8 +280,7 @@ public final class DeadSouls extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        AstraLibs.INSTANCE.rememberPlugin(this);
-        final FileConfiguration config = Modules.getConfigurationModule().getValue().getFileConfiguration();
+        final FileConfiguration config = RootModule.getConfigurationModule().getValue().getFileConfiguration();
         final Logger LOG = getLogger();
 
         {
@@ -345,7 +345,7 @@ public final class DeadSouls extends JavaPlugin {
             try {
                 entityType = EntityType.valueOf(animalName);
             } catch (IllegalArgumentException e) {
-                LOG.log(Level.WARNING, "Ignoring animal type for soul \""+animalName+"\", no such entity name");
+                LOG.log(Level.WARNING, "Ignoring animal type for soul \"" + animalName + "\", no such entity name");
                 continue;
             }
             animalsWithSouls.add(entityType);
@@ -364,7 +364,7 @@ public final class DeadSouls extends JavaPlugin {
         saveDefaultConfig();
 
         final Server server = getServer();
-        new SoulsEventListener(this).onEnable(GlobalEventManager.INSTANCE);
+        new SoulsEventListener(this).onEnable(this);
 
         // Run included tests
         for (String testClassName : new String[]{"com.darkyen.minecraft.ItemStoreTest"}) {
@@ -409,7 +409,7 @@ public final class DeadSouls extends JavaPlugin {
 
         server.getScheduler().runTaskTimer(this, this::processPlayers, 20, 20);
 
-        Objects.requireNonNull(getCommand("souls")).setExecutor(new SoulsCommands(this,soulDatabase));
+        Objects.requireNonNull(getCommand("souls")).setExecutor(new SoulsCommands(this, soulDatabase));
     }
 
     public void refreshEnabledWorlds() {
@@ -439,7 +439,7 @@ public final class DeadSouls extends JavaPlugin {
             try {
                 final int faded = soulDatabase.removeFadedSouls(getPluginConfig().getSoulFadesAfterMs().getValue());
                 if (faded > 0) {
-                    getLogger().log(Level.FINE, "Removed "+faded+" faded soul(s)");
+                    getLogger().log(Level.FINE, "Removed " + faded + " faded soul(s)");
                 }
                 soulDatabase.save();
             } catch (Exception e) {
@@ -447,7 +447,7 @@ public final class DeadSouls extends JavaPlugin {
             }
             this.soulDatabase = null;
         }
-        GlobalEventManager.INSTANCE.onDisable();
+        GlobalEventListener.INSTANCE.onDisable();
         watchedPlayers.clear();
     }
 }

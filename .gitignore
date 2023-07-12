@@ -6,6 +6,7 @@ plugin/build
 .idea
 api-test/build
 build
+jars
 build-logic/.gradle
 build-logic/build
 build-logic/plugins/convention/build

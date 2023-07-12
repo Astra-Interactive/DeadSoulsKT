@@ -20,7 +20,9 @@ class Soul(
     /** World in which the soul is by [World.getUID].  */
     override val world: UUID,
     /** Precise location of the soul in the world.  */
-    override val locationX: Double, override val locationY: Double, override val locationZ: Double,
+    override val locationX: Double,
+    override val locationY: Double,
+    override val locationZ: Double,
     /** When was the soul created on clock of [System.currentTimeMillis].  */
     override val creationTimestamp: Long,
     /** Can be changed when collected  */
@@ -131,15 +133,15 @@ class Soul(
 
     override fun toString(): String {
         return "Soul{" +
-                "id=" + id +
-                ", owner=" + owner +
-                ", locationWorld=" + world +
-                ", locationX=" + locationX +
-                ", locationY=" + locationY +
-                ", locationZ=" + locationZ +
-                ", timestamp=" + creationTimestamp +
-                ", items=" + Arrays.toString(items) +
-                ", xp=" + experiencePoints +
-                '}'
+            "id=" + id +
+            ", owner=" + owner +
+            ", locationWorld=" + world +
+            ", locationX=" + locationX +
+            ", locationY=" + locationY +
+            ", locationZ=" + locationZ +
+            ", timestamp=" + creationTimestamp +
+            ", items=" + Arrays.toString(items) +
+            ", xp=" + experiencePoints +
+            '}'
     }
 }
