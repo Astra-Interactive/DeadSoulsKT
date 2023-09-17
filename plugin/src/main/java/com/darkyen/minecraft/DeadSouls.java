@@ -12,6 +12,7 @@ import com.darkyen.minecraft.utils.*;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -36,7 +37,7 @@ import java.util.regex.Pattern;
 import static com.darkyen.minecraft.di.RootModule.getPluginConfig;
 import static com.darkyen.minecraft.api.DeadSoulsAPIImpl.NO_ITEM_STACKS;
 import static com.darkyen.minecraft.utils.Util.*;
-import ru.astrainteractive.astralibs.events.GlobalEventListener;
+import ru.astrainteractive.astralibs.event.GlobalEventListener;
 
 /**
  *
@@ -175,6 +176,7 @@ public final class DeadSouls extends JavaPlugin {
                 if (soul.getExperiencePoints() > 0 && soul.getItems().length > 0) {
                     player.spawnParticle(Particle.REDSTONE, soulLocation, 10, 0.1, 0.1, 0.1, getPluginConfig().getSoulDustOptionsItems().getValue());
                     player.spawnParticle(Particle.REDSTONE, soulLocation, 10, 0.12, 0.12, 0.12, getPluginConfig().getSoulDustOptionsXp().getValue());
+
                 } else if (soul.getExperiencePoints() > 0) {
                     // Only xp
                     player.spawnParticle(Particle.REDSTONE, soulLocation, 20, 0.1, 0.1, 0.1, getPluginConfig().getSoulDustOptionsXp().getValue());

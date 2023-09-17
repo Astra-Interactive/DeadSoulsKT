@@ -1,5 +1,6 @@
 package com.darkyen.minecraft.mock;
 
+import com.destroystokyo.paper.util.VersionFetcher;
 import com.google.common.collect.Multimap;
 import io.papermc.paper.inventory.ItemRarity;
 import net.kyori.adventure.text.Component;
@@ -163,6 +164,11 @@ public class MockUnsafeValues implements UnsafeValues {
     }
 
     @Override
+    public VersionFetcher getVersionFetcher() {
+        return UnsafeValues.super.getVersionFetcher();
+    }
+
+    @Override
     public byte[] serializeItem(ItemStack item) {
         throw new UnsupportedOperationException("Method not implemented");
     }
@@ -259,6 +265,11 @@ public class MockUnsafeValues implements UnsafeValues {
 
     @Override
     public void setBiomeKey(RegionAccessor accessor, int x, int y, int z, NamespacedKey biomeKey) {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    @Override
+    public String getStatisticCriteriaKey(@NotNull Statistic statistic) {
         throw new UnsupportedOperationException("Method not implemented");
     }
 }
