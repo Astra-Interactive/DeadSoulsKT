@@ -6,22 +6,19 @@ import com.darkyen.minecraft.di.RootModule
 import org.bukkit.Color
 import org.bukkit.Particle
 import org.bukkit.configuration.file.FileConfiguration
-import ru.astrainteractive.astralibs.configuration.DefaultConfiguration
-import ru.astrainteractive.astralibs.configuration.api.MutableConfiguration
-import ru.astrainteractive.astralibs.getValue
-import ru.astrainteractive.astralibs.utils.getFloat
-
+import ru.astrainteractive.klibs.kdi.getValue
+import ru.astrainteractive.klibs.kstorage.MutableStorageValue
 private val plugin by RootModule.plugin
 private val logger: java.util.logging.Logger
     get() = RootModule.logger.provide()
 
 private fun <T> configuration(
     default: T? = null,
-    load: MutableConfiguration<T?>.() -> T?
-) = DefaultConfiguration(
+    load: () -> T?
+) = MutableStorageValue(
     default = default,
-    load = load,
-    save = {}
+    loadSettingsValue = load,
+    saveSettingsValue = {}
 )
 
 fun FileConfiguration.cDustOptions(path: String, defaultColor: Color, defaultDustSize: Float) = configuration {
@@ -45,7 +42,7 @@ fun FileConfiguration.cDouble(path: String, default: Double) = configuration {
 }
 
 fun FileConfiguration.cFloat(path: String, default: Float) = configuration {
-    getFloat(path, default)
+    getDouble(path, default.toDouble()).toFloat()
 }
 
 fun FileConfiguration.cNormalizedKey(path: String, default: String) = configuration {

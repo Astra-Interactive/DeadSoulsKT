@@ -38,6 +38,7 @@ import org.bukkit.help.HelpMap;
 import org.bukkit.inventory.*;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.loot.LootTable;
+import org.bukkit.map.MapCursor;
 import org.bukkit.map.MapView;
 import org.bukkit.material.MaterialData;
 import org.bukkit.packs.DataPackManager;
@@ -377,6 +378,11 @@ public class ServerStub implements Server {
 	}
 
 	@Override
+	public @Nullable ItemStack createExplorerMap(@NotNull World world, @NotNull Location location, org.bukkit.generator.structure.@NotNull StructureType structureType, MapCursor.@NotNull Type mapIcon, int radius, boolean findUnexplored) {
+		return null;
+	}
+
+	@Override
 	public void reload() {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
@@ -384,6 +390,16 @@ public class ServerStub implements Server {
 	@Override
 	public void reloadData() {
 		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public void updateResources() {
+
+	}
+
+	@Override
+	public void updateRecipes() {
+
 	}
 
 	private final Logger logger = Logger.getLogger("ServerStub");
@@ -411,6 +427,11 @@ public class ServerStub implements Server {
 	@Override
 	public boolean addRecipe(@Nullable Recipe recipe) {
 		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public boolean addRecipe(@Nullable Recipe recipe, boolean resendRecipes) {
+		return false;
 	}
 
 	@Override
@@ -453,6 +474,11 @@ public class ServerStub implements Server {
 	@Override
 	public boolean removeRecipe(@NotNull NamespacedKey namespacedKey) {
 		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public boolean removeRecipe(@NotNull NamespacedKey key, boolean resendRecipes) {
+		return false;
 	}
 
 	@Override

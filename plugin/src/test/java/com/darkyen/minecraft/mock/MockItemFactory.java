@@ -40,6 +40,8 @@ public class MockItemFactory implements ItemFactory {
         throw new UnsupportedOperationException("Method not implemented");
     }
 
+
+
     @Override
     public boolean isApplicable(@Nullable ItemMeta meta, @Nullable Material material) throws IllegalArgumentException {
         throw new UnsupportedOperationException("Method not implemented");
@@ -127,7 +129,7 @@ public class MockItemFactory implements ItemFactory {
     }
 
     @Override
-    public @Nullable ItemStack getSpawnEgg(@Nullable EntityType type) {
+    public @Nullable Material getSpawnEgg(@NotNull EntityType type) {
         throw new UnsupportedOperationException("Method not implemented");
     }
 }

@@ -2,12 +2,12 @@ package com.darkyen.minecraft.di
 
 import com.darkyen.minecraft.DeadSouls
 import com.darkyen.minecraft.utils.Configuration
-import ru.astrainteractive.astralibs.Lateinit
-import ru.astrainteractive.astralibs.Module
-import ru.astrainteractive.astralibs.Provider
-import ru.astrainteractive.astralibs.Reloadable
 import ru.astrainteractive.astralibs.filemanager.DefaultSpigotFileManager
-import ru.astrainteractive.astralibs.getValue
+import ru.astrainteractive.klibs.kdi.Lateinit
+import ru.astrainteractive.klibs.kdi.Module
+import ru.astrainteractive.klibs.kdi.Provider
+import ru.astrainteractive.klibs.kdi.Reloadable
+import ru.astrainteractive.klibs.kdi.getValue
 
 object RootModule : Module {
     @JvmStatic

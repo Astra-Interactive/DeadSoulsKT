@@ -8,9 +8,10 @@ dependencies {
     // AstraLibs
     implementation(libs.minecraft.astralibs.ktxcore)
     implementation(libs.minecraft.astralibs.orm)
-    implementation(libs.minecraft.astralibs.di)
     implementation(libs.minecraft.astralibs.spigot.gui)
     implementation(libs.minecraft.astralibs.spigot.core)
+    // klibs
+    implementation(libs.klibs.kdi)
     // Spigot dependencies
     compileOnly(libs.minecraft.paper.api)
     // Test

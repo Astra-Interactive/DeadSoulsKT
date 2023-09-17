@@ -27,7 +27,6 @@ import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
-import ru.astrainteractive.astralibs.events.EventListener;
 
 import java.util.List;
 import java.util.UUID;
@@ -36,6 +35,7 @@ import java.util.logging.Level;
 import static com.darkyen.minecraft.di.RootModule.getPluginConfig;
 import static com.darkyen.minecraft.api.DeadSoulsAPIImpl.NO_ITEM_STACKS;
 import static com.darkyen.minecraft.utils.Util.getTotalExperience;
+import ru.astrainteractive.astralibs.event.EventListener;
 
 public class SoulsEventListener implements EventListener {
     final DeadSouls instance;
