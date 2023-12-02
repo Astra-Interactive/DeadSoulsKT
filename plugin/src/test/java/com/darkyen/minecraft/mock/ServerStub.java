@@ -1,48 +1,72 @@
 package com.darkyen.minecraft.mock;
 
 import com.destroystokyo.paper.entity.ai.MobGoals;
-import com.google.common.collect.Multimap;
 import io.papermc.paper.datapack.DatapackManager;
-import io.papermc.paper.inventory.ItemRarity;
 import io.papermc.paper.math.Position;
 import io.papermc.paper.threadedregions.scheduler.AsyncScheduler;
 import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler;
 import io.papermc.paper.threadedregions.scheduler.RegionScheduler;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.net.InetAddress;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.logging.Logger;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.flattener.ComponentFlattener;
-import net.kyori.adventure.text.serializer.gson.GsonComponentSerializer;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import net.md_5.bungee.api.chat.BaseComponent;
-import net.md_5.bungee.api.chat.hover.content.Content;
-import org.bukkit.*;
+import org.bukkit.BanList;
+import org.bukkit.GameMode;
+import org.bukkit.Keyed;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Registry;
+import org.bukkit.Server;
+import org.bukkit.StructureType;
+import org.bukkit.Tag;
+import org.bukkit.UnsafeValues;
+import org.bukkit.Warning;
+import org.bukkit.World;
+import org.bukkit.WorldBorder;
+import org.bukkit.WorldCreator;
 import org.bukkit.advancement.Advancement;
-import org.bukkit.attribute.Attributable;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.block.Block;
 import org.bukkit.block.data.BlockData;
-import org.bukkit.boss.*;
-import org.bukkit.command.*;
+import org.bukkit.boss.BarColor;
+import org.bukkit.boss.BarFlag;
+import org.bukkit.boss.BarStyle;
+import org.bukkit.boss.BossBar;
+import org.bukkit.boss.KeyedBossBar;
+import org.bukkit.command.CommandException;
+import org.bukkit.command.CommandMap;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.SpawnCategory;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.generator.ChunkGenerator;
 import org.bukkit.help.HelpMap;
-import org.bukkit.inventory.*;
-import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
+import org.bukkit.inventory.ItemCraftResult;
+import org.bukkit.inventory.ItemFactory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.Merchant;
+import org.bukkit.inventory.Recipe;
 import org.bukkit.loot.LootTable;
 import org.bukkit.map.MapCursor;
 import org.bukkit.map.MapView;
-import org.bukkit.material.MaterialData;
 import org.bukkit.packs.DataPackManager;
-import org.bukkit.plugin.*;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.ServicesManager;
 import org.bukkit.plugin.messaging.Messenger;
 import org.bukkit.potion.PotionBrewer;
 import org.bukkit.profile.PlayerProfile;
@@ -53,15 +77,6 @@ import org.bukkit.structure.StructureManager;
 import org.bukkit.util.CachedServerIcon;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Range;
-
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.UnaryOperator;
-import java.util.logging.Logger;
 
 /**
  *
@@ -452,6 +467,21 @@ public class ServerStub implements Server {
 
 	@Override
 	public @NotNull ItemStack craftItem(@NotNull ItemStack[] craftingMatrix, @NotNull World world, @NotNull Player player) {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public @NotNull ItemStack craftItem(@NotNull ItemStack[] craftingMatrix, @NotNull World world) {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public @NotNull ItemCraftResult craftItemResult(@NotNull ItemStack[] craftingMatrix, @NotNull World world, @NotNull Player player) {
+		throw new UnsupportedOperationException("Method not implemented");
+	}
+
+	@Override
+	public @NotNull ItemCraftResult craftItemResult(@NotNull ItemStack[] craftingMatrix, @NotNull World world) {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 
@@ -905,7 +935,7 @@ public class ServerStub implements Server {
 	}
 
 	@Override
-	public @NotNull BlockData createBlockData(@NotNull Material material, @Nullable Consumer<BlockData> consumer) {
+	public @NotNull BlockData createBlockData(@NotNull Material material, @Nullable Consumer<? super BlockData> consumer) {
 		throw new UnsupportedOperationException("Method not implemented");
 	}
 
