@@ -21,6 +21,7 @@ dependencies {
     testImplementation(libs.tests.kotlin.test)
     testImplementation(libs.minecraft.paper.api)
     testImplementation("com.github.MockBukkit:MockBukkit:v1.19-SNAPSHOT")
+    testImplementation("org.mockito:mockito-core:5.8.0")
     // Spigot dependencies
     compileOnly(libs.minecraft.paper.api)
     implementation(libs.minecraft.bstats)
