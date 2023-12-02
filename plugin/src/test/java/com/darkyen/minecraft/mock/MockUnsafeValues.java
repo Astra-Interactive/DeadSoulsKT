@@ -25,6 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 import org.bukkit.plugin.InvalidPluginException;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.potion.PotionType;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -201,6 +202,11 @@ public class MockUnsafeValues implements UnsafeValues {
     @Override
     public @Nullable FeatureFlag getFeatureFlag(@NotNull NamespacedKey key) {
         return null;
+    }
+
+    @Override
+    public PotionType.InternalPotionData getInternalPotionData(NamespacedKey key) {
+        throw new UnsupportedOperationException("Method not implemented");
     }
 
     @Override

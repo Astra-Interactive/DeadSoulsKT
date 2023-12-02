@@ -6,6 +6,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.hover.content.Content;
 import org.bukkit.Color;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.inventory.ItemFactory;
@@ -130,6 +131,21 @@ public class MockItemFactory implements ItemFactory {
 
     @Override
     public @Nullable Material getSpawnEgg(@NotNull EntityType type) {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    @Override
+    public @NotNull ItemStack enchantItem(@NotNull Entity entity, @NotNull ItemStack item, int level, boolean allowTreasures) {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    @Override
+    public @NotNull ItemStack enchantItem(@NotNull World world, @NotNull ItemStack item, int level, boolean allowTreasures) {
+        throw new UnsupportedOperationException("Method not implemented");
+    }
+
+    @Override
+    public @NotNull ItemStack enchantItem(@NotNull ItemStack item, int level, boolean allowTreasures) {
         throw new UnsupportedOperationException("Method not implemented");
     }
 }
