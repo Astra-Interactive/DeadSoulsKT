@@ -2,6 +2,7 @@ package com.darkyen.minecraft.di
 
 import com.darkyen.minecraft.DeadSouls
 import com.darkyen.minecraft.utils.Configuration
+import ru.astrainteractive.astralibs.event.EventListener
 import ru.astrainteractive.astralibs.filemanager.DefaultSpigotFileManager
 import ru.astrainteractive.klibs.kdi.Lateinit
 import ru.astrainteractive.klibs.kdi.Module
@@ -27,6 +28,11 @@ object RootModule : Module {
     val pluginConfigModule = Reloadable {
         val fileConfig by configurationModule
         Configuration(fileConfig.fileConfiguration)
+    }
+
+    @JvmStatic
+    val eventListener by lazy {
+        EventListener.Default()
     }
 
     @JvmStatic

@@ -29,5 +29,9 @@ dependencies {
     implementation(project(":api"))
 }
 
-setupSpigotShadow()
+val destination = File("D:\\Minecraft Servers\\Servers\\esmp-configuration\\smp\\plugins")
+    .takeIf(File::exists)
+    ?: File(rootDir, "jars")
+
+setupSpigotShadow(destination)
 setupSpigotProcessor()

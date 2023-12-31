@@ -37,7 +37,6 @@ import java.util.regex.Pattern;
 import static com.darkyen.minecraft.di.RootModule.getPluginConfig;
 import static com.darkyen.minecraft.api.DeadSoulsAPIImpl.NO_ITEM_STACKS;
 import static com.darkyen.minecraft.utils.Util.*;
-import ru.astrainteractive.astralibs.event.GlobalEventListener;
 
 /**
  *
@@ -449,7 +448,7 @@ public final class DeadSouls extends JavaPlugin {
             }
             this.soulDatabase = null;
         }
-        GlobalEventListener.INSTANCE.onDisable();
+        RootModule.getEventListener().onDisable();
         watchedPlayers.clear();
     }
 }
