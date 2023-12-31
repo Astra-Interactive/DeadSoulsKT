@@ -1,76 +1,72 @@
-package com.darkyen.minecraft.utils;
+package com.darkyen.minecraft.utils
 
-import com.darkyen.minecraft.models.Soul;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
+import com.darkyen.minecraft.models.Soul
+import com.darkyen.minecraft.utils.SpigotCompat.worldGetMinHeight
+import org.bukkit.Location
+import org.bukkit.Material
+import org.bukkit.entity.Player
 
-import java.util.ArrayList;
+class PlayerSoulInfo {
+    @JvmField
+    val lastKnownLocation: Location = Location(null, 0.0, 0.0, 0.0)
 
-import static com.darkyen.minecraft.utils.Util.isNear;
-import static com.darkyen.minecraft.utils.Util.set;
+    @JvmField
+    val lastSafeLocation: Location = Location(null, 0.0, 0.0, 0.0)
 
-public final class PlayerSoulInfo {
-    static final double SOUL_HOVER_OFFSET = 1.2;
+    @JvmField
+    val visibleSouls: ArrayList<Soul> = ArrayList()
 
-    @NotNull
-    public final Location lastKnownLocation = new Location(null, 0, 0, 0);
-
-    @NotNull
-    public final Location lastSafeLocation = new Location(null, 0, 0, 0);
-
-    public final ArrayList<Soul> visibleSouls = new ArrayList<>();
-
-    @NotNull
-    public Location findSafeSoulSpawnLocation(@NotNull Player player) {
-        final Location playerLocation = player.getLocation();
-        if (isNear(lastSafeLocation, playerLocation, 20)) {
-            set(playerLocation, lastSafeLocation);
-            playerLocation.setY(playerLocation.getY() + SOUL_HOVER_OFFSET);
-            return playerLocation;
+    fun findSafeSoulSpawnLocation(player: Player): Location {
+        val playerLocation = player.location
+        if (Util.isNear(lastSafeLocation, playerLocation, 20f)) {
+            Util.set(playerLocation, lastSafeLocation)
+            playerLocation.y += SOUL_HOVER_OFFSET
+            return playerLocation
         }
 
         // Too far, now we have to find a better location
-        return findFallbackSoulSpawnLocation(player, playerLocation, true);
+        return findFallbackSoulSpawnLocation(player, playerLocation, true)
     }
 
-    @NotNull
-    public static Location findFallbackSoulSpawnLocation(@NotNull Player player, @NotNull Location playerLocation, boolean improve) {
-        final World world = player.getWorld();
+    companion object {
+        const val SOUL_HOVER_OFFSET: Double = 1.2
 
-        final int x = playerLocation.getBlockX();
-        int y = Util.clamp(playerLocation.getBlockY(), SpigotCompat.worldGetMinHeight(world), world.getMaxHeight());
-        final int z = playerLocation.getBlockZ();
+        @Suppress("LoopWithTooManyJumpStatements", "NestedBlockDepth")
+        fun findFallbackSoulSpawnLocation(player: Player, playerLocation: Location, improve: Boolean): Location {
+            val world = player.world
 
-        if (improve) {
-            int yOff = 0;
-            while (true) {
-                final Material type = world.getBlockAt(x, y + yOff, z).getType();
-                if (type.isSolid()) {
-                    // Soul either started in a block or ended in it, do not want
-                    yOff = 0;
-                    break;
-                } else if (type == Material.LAVA) {
-                    yOff++;
+            val x = playerLocation.blockX
+            var y = Util.clamp(playerLocation.blockY, worldGetMinHeight(world), world.maxHeight)
+            val z = playerLocation.blockZ
 
-                    if (yOff > 8) {
-                        // Probably dead in a lava column, we don't want to push it up
-                        yOff = 0;
-                        break;
+            if (improve) {
+                var yOff = 0
+                while (true) {
+                    val type = world.getBlockAt(x, y + yOff, z).type
+                    if (type.isSolid) {
+                        // Soul either started in a block or ended in it, do not want
+                        yOff = 0
+                        break
+                    } else if (type == Material.LAVA) {
+                        yOff++
+
+                        if (yOff > 8) {
+                            // Probably dead in a lava column, we don't want to push it up
+                            yOff = 0
+                            break
+                        }
+                        // continue
+                    } else {
+                        // This place looks good
+                        break
                     }
-                    // continue
-                } else {
-                    // This place looks good
-                    break;
                 }
+
+                y += yOff
             }
 
-            y += yOff;
+            playerLocation.y = y + SOUL_HOVER_OFFSET
+            return playerLocation
         }
-
-        playerLocation.setY(y + SOUL_HOVER_OFFSET);
-        return playerLocation;
     }
 }
