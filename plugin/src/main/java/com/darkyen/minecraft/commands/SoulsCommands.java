@@ -3,9 +3,11 @@ package com.darkyen.minecraft.commands;
 import com.darkyen.minecraft.DeadSouls;
 import com.darkyen.minecraft.database.SoulDatabase;
 import com.darkyen.minecraft.models.Soul;
+import com.darkyen.minecraft.utils.ExtSoul;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Server;
@@ -58,7 +60,7 @@ public class SoulsCommands implements CommandExecutor {
 
         if ("free".equalsIgnoreCase(word)) {
             if (!getPluginConfig().getSoulFreeingEnabled()) {
-                sender.sendMessage(org.bukkit.ChatColor.RED+"This world does not understand the concept of freeing");
+                sender.sendMessage(org.bukkit.ChatColor.RED + "This world does not understand the concept of freeing");
                 return true;
             }
 
@@ -70,52 +72,52 @@ public class SoulsCommands implements CommandExecutor {
 
         if ("goto".equalsIgnoreCase(word)) {
             if (!(sender instanceof Player)) {
-                sender.sendMessage(org.bukkit.ChatColor.RED+"This sub-command is only accessible in-game");
+                sender.sendMessage(org.bukkit.ChatColor.RED + "This sub-command is only accessible in-game");
                 return true;
             }
 
             final Soul soul = soulDatabase.getSoulById(number);
             if (soul == null) {
-                sender.sendMessage(org.bukkit.ChatColor.RED+"This soul does not exist");
+                sender.sendMessage(org.bukkit.ChatColor.RED + "This soul does not exist");
                 return true;
             }
 
             if (!sender.hasPermission("com.darkyen.minecraft.deadsouls.souls.goto.all")) {
                 if (soul.isOwnedBy(sender)) {
                     if (!sender.hasPermission("com.darkyen.minecraft.deadsouls.souls.goto")) {
-                        sender.sendMessage(org.bukkit.ChatColor.RED+"You are not allowed to do that");
+                        sender.sendMessage(org.bukkit.ChatColor.RED + "You are not allowed to do that");
                         return true;
                     }
                 } else {
-                    sender.sendMessage(org.bukkit.ChatColor.RED+"You are not allowed to do that");
+                    sender.sendMessage(org.bukkit.ChatColor.RED + "You are not allowed to do that");
                     return true;
                 }
             }
 
             final World world = instance.getServer().getWorld(soul.getWorld());
             if (world == null) {
-                sender.sendMessage(org.bukkit.ChatColor.RED+"The soul is not in any world");
+                sender.sendMessage(org.bukkit.ChatColor.RED + "The soul is not in any world");
                 return true;
             }
 
-            ((Player)sender).teleport(new Location(world, soul.getLocationX(), soul.getLocationY(), soul.getLocationZ()), PlayerTeleportEvent.TeleportCause.COMMAND);
-            sender.sendMessage(org.bukkit.ChatColor.AQUA+"Teleported");
+            ((Player) sender).teleport(new Location(world, soul.getLocationX(), soul.getLocationY(), soul.getLocationZ()), PlayerTeleportEvent.TeleportCause.COMMAND);
+            sender.sendMessage(org.bukkit.ChatColor.AQUA + "Teleported");
             return true;
         }
 
         if ("reload".equalsIgnoreCase(word) && sender.isOp()) {
-            sender.sendMessage(org.bukkit.ChatColor.RED+"----------------------------");
-            sender.sendMessage(org.bukkit.ChatColor.RED+"Reloading plugin Dead Souls");
-            sender.sendMessage(org.bukkit.ChatColor.RED+"RELOAD FUNCTIONALITY IS ONLY FOR TESTING AND EXPERIMENTING AND SHOULD NEVER BE USED ON A LIVE SERVER!!!");
-            sender.sendMessage(org.bukkit.ChatColor.RED+"If you encounter any problems with the plugin after the reload, restart the server!");
-            sender.sendMessage(org.bukkit.ChatColor.RED+"----------------------------");
+            sender.sendMessage(org.bukkit.ChatColor.RED + "----------------------------");
+            sender.sendMessage(org.bukkit.ChatColor.RED + "Reloading plugin Dead Souls");
+            sender.sendMessage(org.bukkit.ChatColor.RED + "RELOAD FUNCTIONALITY IS ONLY FOR TESTING AND EXPERIMENTING AND SHOULD NEVER BE USED ON A LIVE SERVER!!!");
+            sender.sendMessage(org.bukkit.ChatColor.RED + "If you encounter any problems with the plugin after the reload, restart the server!");
+            sender.sendMessage(org.bukkit.ChatColor.RED + "----------------------------");
 
             final Server server = instance.getServer();
             server.getPluginManager().disablePlugin(instance);
             instance.reloadConfig();
             server.getPluginManager().enablePlugin(instance);
 
-            sender.sendMessage(org.bukkit.ChatColor.RED+" - Reload done - ");
+            sender.sendMessage(org.bukkit.ChatColor.RED + " - Reload done - ");
             return true;
         }
 
@@ -167,7 +169,7 @@ public class SoulsCommands implements CommandExecutor {
                     sender.sendMessage(String.format("%d) %s %.1f %.1f %.1f   %s", id, worldStr, soul.getLocationX(), soul.getLocationY(), soul.getLocationZ(), ownerStr));
                 }
             }
-            sender.sendMessage(shownSouls+" souls");
+            sender.sendMessage(shownSouls + " souls");
         } else {
             // Normal player output
             final List<@NotNull Soul> souls = soulDatabase.getSoulsByOwnerAndWorld(listAllSouls ? null : senderUUID, ((Player) sender).getWorld().getUID());
@@ -185,7 +187,7 @@ public class SoulsCommands implements CommandExecutor {
                 final Soul soul = souls.get(i);
                 final float distance = (float) Math.sqrt(distance2(soul, location, 1));
 
-                final TextComponent baseText = new TextComponent((i+1)+" ");
+                final TextComponent baseText = new TextComponent((i + 1) + " ");
                 baseText.setColor(ChatColor.AQUA);
                 baseText.setBold(true);
 
@@ -208,6 +210,11 @@ public class SoulsCommands implements CommandExecutor {
                     ageText.setColor(ChatColor.WHITE);
                     ageText.setItalic(true);
                     baseText.addExtra(ageText);
+
+                    final TextComponent ownerText = new TextComponent(" " + ExtSoul.INSTANCE.getPlayerName(soul));
+                    ageText.setColor(ChatColor.WHITE);
+                    ageText.setItalic(false);
+                    baseText.addExtra(ownerText);
                 }
 
                 if (sender.hasPermission("com.darkyen.minecraft.deadsouls.coordinates")) {
@@ -230,7 +237,7 @@ public class SoulsCommands implements CommandExecutor {
                     freeButton.setColor(ChatColor.GREEN);
                     freeButton.setBold(true);
                     freeButton.setUnderlined(true);
-                    freeButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/souls free "+ soul.getId()));
+                    freeButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/souls free " + soul.getId()));
                     baseText.addExtra("  ");
                     baseText.addExtra(freeButton);
                 }
@@ -240,7 +247,7 @@ public class SoulsCommands implements CommandExecutor {
                     gotoButton.setColor(ChatColor.GOLD);
                     gotoButton.setBold(true);
                     gotoButton.setUnderlined(true);
-                    gotoButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/souls goto "+ soul.getId()));
+                    gotoButton.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/souls goto " + soul.getId()));
                     baseText.addExtra("  ");
                     baseText.addExtra(gotoButton);
                 }
@@ -260,15 +267,15 @@ public class SoulsCommands implements CommandExecutor {
             }
             arrows.addExtra(left);
 
-            arrows.addExtra(" page "+(number + 1)+"/"+pages+" ");
+            arrows.addExtra(" page " + (number + 1) + "/" + pages + " ");
 
             final TextComponent right = new TextComponent(rightArrow ? ">>" : "  ");
             right.setColor(ChatColor.GRAY);
             if (rightArrow) {
-                right.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/souls page "+(number + 1)));
+                right.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/souls page " + (number + 1)));
             }
             arrows.addExtra(right);
-            arrows.addExtra(" ("+souls.size()+" souls total)");
+            arrows.addExtra(" (" + souls.size() + " souls total)");
 
             sender.spigot().sendMessage(arrows);
         }
