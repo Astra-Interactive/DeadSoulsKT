@@ -28,7 +28,7 @@ class DeathEventListener(private val instance: DeadSouls) : EventListener {
     }
 
     @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGH)
-    @Suppress("CyclomaticComplexMethod")
+    @Suppress("CyclomaticComplexMethod", "LongMethod")
     fun onPlayerDeath(event: PlayerDeathEvent) {
         val player = event.entity
         if (!player.hasPermission("com.darkyen.minecraft.deadsouls.hassoul")) {
@@ -176,8 +176,8 @@ class DeathEventListener(private val instance: DeadSouls) : EventListener {
             pluginConfig.textFreeMySoul.value.isNotEmpty() &&
             (
                 player.hasPermission("com.darkyen.minecraft.deadsouls.souls.free") || player.hasPermission(
-                        "com.darkyen.minecraft.deadsouls.souls.free.all"
-                    )
+                    "com.darkyen.minecraft.deadsouls.souls.free.all"
+                )
                 )
         ) {
             val star = TextComponent("✦")

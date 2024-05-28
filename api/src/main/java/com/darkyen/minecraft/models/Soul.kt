@@ -14,6 +14,7 @@ import java.util.*
 
 /** A soul in a database. The fields that are not final can be modified,
  * but don't forget to [SoulDatabase.markDirty] if you do to ensure that the changes are saved.  */
+@Suppress("LongParameterList")
 class Soul(
     /** Current owner of the soul by [Player.getUniqueId].  */
     override var owner: UUID?,
