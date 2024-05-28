@@ -1,10 +1,3 @@
-buildscript {
-    dependencies {
-        classpath("ru.astrainteractive.gradleplugin:convention:1.1.2")
-        classpath("ru.astrainteractive.gradleplugin:minecraft:1.1.2")
-    }
-}
-
 plugins {
     java
     `maven-publish`
