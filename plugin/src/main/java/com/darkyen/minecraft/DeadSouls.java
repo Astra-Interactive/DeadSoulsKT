@@ -171,15 +171,15 @@ public final class DeadSouls extends JavaPlugin {
 
                 // Show this soul!
                 if (soul.getExperiencePoints() > 0 && soul.getItems().length > 0) {
-                    player.spawnParticle(Particle.REDSTONE, soulLocation, 10, 0.1, 0.1, 0.1, getPluginConfig().getSoulDustOptionsItems().getValue());
-                    player.spawnParticle(Particle.REDSTONE, soulLocation, 10, 0.12, 0.12, 0.12, getPluginConfig().getSoulDustOptionsXp().getValue());
+                    player.spawnParticle(Particle.DUST, soulLocation, 10, 0.1, 0.1, 0.1, getPluginConfig().getSoulDustOptionsItems().getValue());
+                    player.spawnParticle(Particle.DUST, soulLocation, 10, 0.12, 0.12, 0.12, getPluginConfig().getSoulDustOptionsXp().getValue());
 
                 } else if (soul.getExperiencePoints() > 0) {
                     // Only xp
-                    player.spawnParticle(Particle.REDSTONE, soulLocation, 20, 0.1, 0.1, 0.1, getPluginConfig().getSoulDustOptionsXp().getValue());
+                    player.spawnParticle(Particle.DUST, soulLocation, 20, 0.1, 0.1, 0.1, getPluginConfig().getSoulDustOptionsXp().getValue());
                 } else {
                     // Only items
-                    player.spawnParticle(Particle.REDSTONE, soulLocation, 20, 0.1, 0.1, 0.1, getPluginConfig().getSoulDustOptionsItems().getValue());
+                    player.spawnParticle(Particle.DUST, soulLocation, 20, 0.1, 0.1, 0.1, getPluginConfig().getSoulDustOptionsItems().getValue());
                 }
                 remainingSoulsToShow--;
             }
@@ -254,7 +254,7 @@ public final class DeadSouls extends JavaPlugin {
                                     if (!getPluginConfig().getSoundSoulDepleted().getValue().isEmpty()) {
                                         player.playSound(closestSoulLocation, getPluginConfig().getSoundSoulDepleted().getValue(), 0.1f, 0.5f);
                                     }
-                                    player.spawnParticle(Particle.REDSTONE, closestSoulLocation, 20, 0.2, 0.2, 0.2, getPluginConfig().getSoulDustOptionsGone().getValue());
+                                    player.spawnParticle(Particle.DUST, closestSoulLocation, 20, 0.2, 0.2, 0.2, getPluginConfig().getSoulDustOptionsGone().getValue());
                                 }
                             }
                         }
