@@ -1,21 +1,17 @@
-package com.darkyen.minecraft;
+package com.darkyen.minecraft
 
-import com.darkyen.minecraft.utils.Util;
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
+import com.darkyen.minecraft.utils.Util
+import org.junit.Assert
+import org.junit.Test
 
-/**
- *
- */
-public final class ExpTest {
-
+class ExpTest {
     @Test
-    public void expTest() {
-        int total = 0;
-        for (int level = 0; level < 100; level++) {
-            total += Util.getExpToLevel(level);
-            assertEquals(total, Util.getExperienceToReach(level + 1));
+    @Suppress("MemberNameEqualsClassName")
+    fun expTest() {
+        var total = 0
+        for (level in 0..99) {
+            total += Util.getExpToLevel(level)
+            Assert.assertEquals(total.toLong(), Util.getExperienceToReach(level + 1).toLong())
         }
     }
-
 }

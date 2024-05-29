@@ -1,5 +1,12 @@
 package com.darkyen.minecraft;
 
+import com.darkyen.minecraft.database.SoulDatabase;
+import com.darkyen.minecraft.models.Soul;
+import com.darkyen.minecraft.utils.channels.ByteBufferChannel;
+import com.darkyen.minecraft.utils.channels.DataInputChannel;
+import com.darkyen.minecraft.utils.channels.DataOutputChannel;
+import com.darkyen.minecraft.utils.serialization.Serialization;
+import junit.framework.AssertionFailedError;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -13,8 +20,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.junit.jupiter.api.Assertions;
-import org.opentest4j.AssertionFailedError;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,6 +35,10 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 /**
  *
  */
@@ -39,7 +48,7 @@ class ItemStoreTest {
     private static final Random random = new Random();
 
     private static void testSerialization(ItemStack item) throws Exception {
-        final SoulDatabase.Soul soul = new SoulDatabase.Soul(
+        final Soul soul = new Soul(
                 random.nextBoolean() ? Bukkit.getOfflinePlayers()[0].getUniqueId() : null,
                 Bukkit.getWorlds().get(0).getUID(),
                 (double) random.nextInt(5000) - 2500,
@@ -52,19 +61,19 @@ class ItemStoreTest {
 
         final ByteBufferChannel byteBufferChannel = new ByteBufferChannel();
         try (DataOutputChannel channel = new DataOutputChannel(byteBufferChannel)) {
-            Assertions.assertTrue(SoulDatabase.serializeSoul(soul, channel));
+            assertTrue(SoulDatabase.serializeSoul(soul, channel));
         }
         byteBufferChannel.position(0L);
-        final SoulDatabase.Soul soulFromHell = SoulDatabase.deserializeSoul(new DataInputChannel(byteBufferChannel), SoulDatabase.CURRENT_DB_VERSION);
+        final Soul soulFromHell = SoulDatabase.deserializeSoul(new DataInputChannel(byteBufferChannel), SoulDatabase.CURRENT_DB_VERSION);
 
-        Assertions.assertEquals(soul.locationWorld, soulFromHell.locationWorld);
-        Assertions.assertEquals(soul.locationX, soulFromHell.locationX);
-        Assertions.assertEquals(soul.locationY, soulFromHell.locationY);
-        Assertions.assertEquals(soul.locationZ, soulFromHell.locationZ);
-        Assertions.assertEquals(soul.timestamp, soulFromHell.timestamp);
-        Assertions.assertEquals(soul.xp, soulFromHell.xp);
-        Assertions.assertEquals(soul.owner, soulFromHell.owner);
-        Assertions.assertArrayEquals(soul.items, soulFromHell.items);
+        assertEquals(soul.getWorld(), soulFromHell.getWorld());
+        assertEquals(soul.getLocationY(), soulFromHell.getLocationY(),0.0001);
+        assertEquals(soul.getLocationX(), soulFromHell.getLocationX(),0.0001);
+        assertEquals(soul.getLocationZ(), soulFromHell.getLocationZ(),0.0001);
+        assertEquals(soul.getCreationTimestamp(), soulFromHell.getCreationTimestamp());
+        assertEquals(soul.getExperiencePoints(), soulFromHell.getExperiencePoints());
+        assertEquals(soul.getOwner(), soulFromHell.getOwner());
+        assertArrayEquals(soul.getItems(), soulFromHell.getItems());
     }
 
     private static void savingTest() throws IOException, Serialization.Exception {
@@ -76,29 +85,29 @@ class ItemStoreTest {
             final ItemStack[] itemStacks = new ItemStack[random.nextInt(100)];
             for (int item = 0; item < itemStacks.length; item++) {
                 itemStacks[item] = new ItemStack(Material.DIAMOND_SWORD, 1);
-                itemStacks[item].addEnchantment(Enchantment.DAMAGE_ALL, 3);
+                itemStacks[item].addEnchantment(Enchantment.SHARPNESS, 3);
                 final ItemMeta itemMeta = itemStacks[item].getItemMeta();
                 assert itemMeta != null;
-                itemMeta.setDisplayName("BLAH"+item);
+                itemMeta.setDisplayName("BLAH" + item);
                 itemMeta.setUnbreakable(true);
                 itemStacks[item].setItemMeta(itemMeta);
             }
             soulDatabase.addSoul(UUID.randomUUID(), UUID.randomUUID(), random.nextDouble(), random.nextDouble(), random.nextDouble(), itemStacks, random.nextInt(100000));
-            Assertions.assertTrue(soulDatabase.save());
+            assertTrue(soulDatabase.save());
 
-            final List<SoulDatabase.Soul> loaded = SoulDatabase.load(temporaryDatabaseFile);
-            final List<SoulDatabase.@Nullable Soul> expected = soulDatabase.getSoulsById();
+            final List<Soul> loaded = SoulDatabase.load(temporaryDatabaseFile);
+            final List<@Nullable Soul> expected = soulDatabase.getSoulsById();
 
             if (loaded.size() != expected.size()) {
-                throw new AssertionError(loaded + " " +expected);
+                throw new AssertionError(loaded + " " + expected);
             }
 
             for (int i = 0; i < loaded.size(); i++) {
-                final SoulDatabase.Soul loadedSoul = loaded.get(i);
-                final SoulDatabase.Soul expectedSoul = expected.get(i);
+                final Soul loadedSoul = loaded.get(i);
+                final Soul expectedSoul = expected.get(i);
 
                 if (!expectedSoul.equals(loadedSoul)) {
-                    throw new AssertionError(loadedSoul + " " +expectedSoul);
+                    throw new AssertionError(loadedSoul + " " + expectedSoul);
                 }
             }
         }
@@ -130,7 +139,8 @@ class ItemStoreTest {
                             item.addUnsafeEnchantment(enchantment, 1 + random.nextInt(enchantment.getMaxLevel()));
                         }
                     }
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
 
             final ItemMeta meta = item.getItemMeta();
@@ -144,7 +154,7 @@ class ItemStoreTest {
                 }
 
                 if (random.nextBoolean()) {
-                    meta.setDisplayName("Nombre: "+random.nextInt());
+                    meta.setDisplayName("Nombre: " + random.nextInt());
                 }
 
                 if (random.nextBoolean()) {
@@ -156,7 +166,7 @@ class ItemStoreTest {
                 }
 
                 if (random.nextBoolean()) {
-                    meta.setLocalizedName("Localized Nombre: "+random.nextInt());
+                    meta.setLocalizedName("Localized Nombre: " + random.nextInt());
                 }
 
                 if (random.nextBoolean()) {
@@ -173,7 +183,7 @@ class ItemStoreTest {
                     testSerialization(sanitize(item));
                 }
             } catch (Throwable t) {
-                System.out.println("Failed: "+item.getType());
+                System.out.println("Failed: " + item.getType());
             }
         }
 
@@ -204,7 +214,7 @@ class ItemStoreTest {
             final Map<String, Object> sanitized = (Map<String, Object>) sanitize(serialized);
             return ItemStack.deserialize(sanitized);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to sanitize "+item, e);
+            throw new RuntimeException("Failed to sanitize " + item, e);
         }
     }
 
