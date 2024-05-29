@@ -1,6 +1,6 @@
-package com.darkyen.minecraft.utils.serialization;
+package com.darkyen.minecraft.utils.serialization
 
-public enum SerializedType {
+enum class SerializedType {
     NULL,
     PRIMITIVE_BOOLEAN_TRUE,
     PRIMITIVE_BOOLEAN_FALSE,
@@ -12,15 +12,21 @@ public enum SerializedType {
     PRIMITIVE_FLOAT,
     PRIMITIVE_DOUBLE,
     STRING,
-    /** List with a small number of entries whose amount fit into a byte. */
+
+    /** List with a small number of entries whose amount fit into a byte.  */
     LIST_BYTE,
     LIST,
-    /** Map with a small number of entries whose amount fit into a byte. */
+
+    /** Map with a small number of entries whose amount fit into a byte.  */
     MAP_BYTE,
     MAP,
-    /** ConfigurationSerializable whose root map has a small number of entries whose amount fit into a byte. */
+
+    /** ConfigurationSerializable whose root map has a small number of entries whose amount fit into a byte.  */
     CONFIGURATION_SERIALIZABLE_BYTE,
     CONFIGURATION_SERIALIZABLE;
 
-    static final SerializedType[] VALUES = values();
+    companion object {
+        @JvmField
+        val VALUES: Array<SerializedType> = entries.toTypedArray()
+    }
 }
