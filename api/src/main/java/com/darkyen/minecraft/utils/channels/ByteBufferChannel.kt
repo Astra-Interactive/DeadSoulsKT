@@ -1,88 +1,70 @@
-package com.darkyen.minecraft.utils.channels;
+package com.darkyen.minecraft.utils.channels
 
-import org.jetbrains.annotations.NotNull;
-
-import java.nio.ByteBuffer;
-import java.nio.channels.SeekableByteChannel;
+import java.nio.ByteBuffer
+import java.nio.channels.SeekableByteChannel
 
 /**
  *
  */
-public final class ByteBufferChannel implements SeekableByteChannel {
+class ByteBufferChannel(private val buffer: ByteBuffer) : SeekableByteChannel {
 
-    @NotNull
-    private final ByteBuffer buffer;
+    @JvmOverloads
+    constructor(size: Int = 8096) : this(ByteBuffer.allocate(size))
 
-
-    public ByteBufferChannel(int size) {
-        this.buffer = ByteBuffer.allocate(size);
-        buffer.limit(0);
+    init {
+        buffer.limit(0)
     }
 
-    public ByteBufferChannel() {
-        this(8096);
-    }
-
-    @Override
-    public int read(@NotNull ByteBuffer dst) {
-        final int available = buffer.remaining();
+    override fun read(dst: ByteBuffer): Int {
+        val available = buffer.remaining()
         if (available == 0) {
-            return -1;
+            return -1
         }
-        final int toRead = dst.remaining();
+        val toRead = dst.remaining()
         if (available > toRead) {
-            final int oldLimit = buffer.limit();
-            buffer.limit(buffer.position() + toRead);
-            dst.put(buffer);
-            buffer.limit(oldLimit);
-            return toRead;
+            val oldLimit = buffer.limit()
+            buffer.limit(buffer.position() + toRead)
+            dst.put(buffer)
+            buffer.limit(oldLimit)
+            return toRead
         } else {
             // available < toRead
-            dst.put(buffer);
-            return available;
+            dst.put(buffer)
+            return available
         }
     }
 
-    @Override
-    public int write(@NotNull ByteBuffer src) {
-        final int toWrite = src.remaining();
+    override fun write(src: ByteBuffer): Int {
+        val toWrite = src.remaining()
         if (buffer.remaining() < toWrite) {
             // Expand
-            buffer.limit(buffer.position() + toWrite);
+            buffer.limit(buffer.position() + toWrite)
         }
-        buffer.put(src);
-        return toWrite;
+        buffer.put(src)
+        return toWrite
     }
 
-    @Override
-    public long position() {
-        return buffer.position();
+    override fun position(): Long {
+        return buffer.position().toLong()
     }
 
-    @NotNull
-    @Override
-    public ByteBufferChannel position(long newPosition) {
-        buffer.position((int) newPosition);
-        return this;
+    override fun position(newPosition: Long): ByteBufferChannel {
+        buffer.position(newPosition.toInt())
+        return this
     }
 
-    @Override
-    public long size() {
-        return buffer.limit();
+    override fun size(): Long {
+        return buffer.limit().toLong()
     }
 
-    @NotNull
-    @Override
-    public ByteBufferChannel truncate(long size) {
-        buffer.limit((int)size);
-        return this;
+    override fun truncate(size: Long): ByteBufferChannel {
+        buffer.limit(size.toInt())
+        return this
     }
 
-    @Override
-    public boolean isOpen() {
-        return true;
+    override fun isOpen(): Boolean {
+        return true
     }
 
-    @Override
-    public void close() {}
+    override fun close() = Unit
 }
