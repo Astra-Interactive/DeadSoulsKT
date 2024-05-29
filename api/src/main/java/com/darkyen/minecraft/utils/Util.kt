@@ -1,242 +1,261 @@
-package com.darkyen.minecraft.utils;
+@file: Suppress("TooManyFunctions", "Indentation", "SwallowedException")
 
-import com.darkyen.minecraft.models.Soul;
-import org.bukkit.Color;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.util.NumberConversions;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+package com.darkyen.minecraft.utils
 
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.regex.Pattern;
+import com.darkyen.minecraft.models.Soul
+import org.bukkit.Color
+import org.bukkit.Location
+import org.bukkit.World
+import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
+import org.bukkit.util.NumberConversions
+import java.util.Locale
+import java.util.concurrent.TimeUnit
+import java.util.logging.Level
+import java.util.logging.Logger
+import java.util.regex.Pattern
+import kotlin.math.max
+import kotlin.math.min
 
-/**
- *
- */
-@SuppressWarnings("WeakerAccess")
-public final class Util {
-
-    public static boolean overlaps(int quadMin, int quadMax, int queryMin, int queryMax) {
-        return queryMin <= quadMax && queryMax >= quadMin;
+object Util {
+    @JvmStatic
+    fun overlaps(quadMin: Int, quadMax: Int, queryMin: Int, queryMax: Int): Boolean {
+        return queryMin <= quadMax && queryMax >= quadMin
     }
 
-    @Nullable
-    public static World getWorld(@Nullable Location loc) {
+    @JvmStatic
+    fun getWorld(loc: Location?): World? {
         if (loc == null) {
-            return null;
+            return null
         }
         try {
-            if (!loc.isWorldLoaded()) {
-                return null;
+            if (!loc.isWorldLoaded) {
+                return null
             }
-        } catch (Throwable ignored) {
+        } catch (ignored: Throwable) {
             // isWorldLoaded is not available on servers < 1.14
         }
-        try {
-            return loc.getWorld();
-        } catch (Throwable ignored) {
+        return try {
+            loc.world
+        } catch (ignored: Throwable) {
             // (>= 1.14) If the world gets unloaded between check above and now, this could throw, but it is unlikely.
-            return null;
+            null
         }
     }
 
-    public static double distance2(@NotNull Location a, @NotNull Location b) {
-        final World aWorld = getWorld(a);
-        final World bWorld = getWorld(b);
-        if (aWorld == null || !aWorld.equals(bWorld)) {
-            return Double.POSITIVE_INFINITY;
+    @JvmStatic
+    fun distance2(a: Location, b: Location): Double {
+        val aWorld = getWorld(a)
+        val bWorld = getWorld(b)
+        if (aWorld == null || aWorld != bWorld) {
+            return Double.POSITIVE_INFINITY
         }
-        return NumberConversions.square(a.getX() - b.getX()) + NumberConversions.square(a.getY() - b.getY()) + NumberConversions.square(a.getZ() - b.getZ());
+        return NumberConversions.square(a.x - b.x) +
+                NumberConversions.square(a.y - b.y) +
+                NumberConversions.square(a.z - b.z)
     }
 
-    public static double distance2(@NotNull Location a, @NotNull Location b, double yScale) {
-        final World aWorld = getWorld(a);
-        final World bWorld = getWorld(b);
-        if (aWorld == null || !aWorld.equals(bWorld)) {
-            return Double.POSITIVE_INFINITY;
+    @JvmStatic
+    fun distance2(a: Location, b: Location, yScale: Double): Double {
+        val aWorld = getWorld(a)
+        val bWorld = getWorld(b)
+        if (aWorld == null || aWorld != bWorld) {
+            return Double.POSITIVE_INFINITY
         }
-        return NumberConversions.square(a.getX() - b.getX()) + NumberConversions.square((a.getY() - b.getY()) * yScale) + NumberConversions.square(a.getZ() - b.getZ());
+        return NumberConversions.square(a.x - b.x) +
+                NumberConversions.square((a.y - b.y) * yScale) +
+                NumberConversions.square(a.z - b.z)
     }
 
-    public static double distance2(@NotNull Soul soul, @NotNull Location loc, double yScale) {
-        final World locWorld = getWorld(loc);
-        if (locWorld == null || !soul.getWorld().equals(locWorld.getUID())) {
-            return Double.POSITIVE_INFINITY;
+    @JvmStatic
+    fun distance2(soul: Soul, loc: Location, yScale: Double): Double {
+        val locWorld = getWorld(loc)
+        if (locWorld == null || soul.world != locWorld.uid) {
+            return Double.POSITIVE_INFINITY
         }
-        return NumberConversions.square(soul.getLocationX() - loc.getX()) + NumberConversions.square((soul.getLocationY() - loc.getY()) * yScale) + NumberConversions.square(soul.getLocationZ() - loc.getZ());
+        return NumberConversions.square(soul.locationX - loc.x) +
+                NumberConversions.square((soul.locationY - loc.y) * yScale) +
+                NumberConversions.square(soul.locationZ - loc.z)
     }
 
-    public static boolean isNear(@NotNull Location a, @NotNull Location b, float distance) {
-        final World aWorld = getWorld(a);
-        final World bWorld = getWorld(b);
-        if (aWorld == null || !aWorld.equals(bWorld)) {
-            return false;
+    @JvmStatic
+    fun isNear(a: Location, b: Location, distance: Float): Boolean {
+        val aWorld = getWorld(a)
+        val bWorld = getWorld(b)
+        if (aWorld == null || aWorld != bWorld) {
+            return false
         }
-        final double dst2 = NumberConversions.square(a.getX() - b.getX()) + NumberConversions.square(a.getZ() - b.getZ());
-        return dst2 < distance * distance;
+        val dst2 = NumberConversions.square(a.x - b.x) + NumberConversions.square(a.z - b.z)
+        return dst2 < distance * distance
     }
 
-    public static void set(@NotNull Location target, @NotNull Location source) {
-        target.setWorld(getWorld(source));
-        target.setX(source.getX());
-        target.setY(source.getY());
-        target.setZ(source.getZ());
+    @JvmStatic
+    fun set(target: Location, source: Location) {
+        target.world = getWorld(source)
+        target.x = source.x
+        target.y = source.y
+        target.z = source.z
     }
 
-    public static final Pattern TIME_SANITIZER = Pattern.compile("[^a-zA-Z0-9]");
-    public static long parseTimeMs(@Nullable String time, long defaultMs, @NotNull Logger log) {
+    @JvmField
+    val TIME_SANITIZER: Pattern = Pattern.compile("[^a-zA-Z0-9]")
+
+    @JvmStatic
+    fun parseTimeMs(time: String?, defaultMs: Long, log: Logger): Long {
         if (time == null) {
-            return defaultMs;
+            return defaultMs
         }
-        final String sanitized = TIME_SANITIZER.matcher(time).replaceAll("");
-        if ("never".equalsIgnoreCase(sanitized)) {
-            return Long.MAX_VALUE;
+        val sanitized = TIME_SANITIZER.matcher(time).replaceAll("")
+        if ("never".equals(sanitized, ignoreCase = true)) {
+            return Long.MAX_VALUE
         }
-        int firstLetterIndex = 0;
-        while (firstLetterIndex < sanitized.length() && Character.isDigit(sanitized.charAt(firstLetterIndex))) {
-            firstLetterIndex++;
+        var firstLetterIndex = 0
+        while (firstLetterIndex < sanitized.length && Character.isDigit(sanitized[firstLetterIndex])) {
+            firstLetterIndex++
         }
-        if (firstLetterIndex >= sanitized.length()) {
-            log.log(Level.WARNING, "Time \""+time+"\" is missing an unit");
-            return defaultMs;
+        if (firstLetterIndex >= sanitized.length) {
+            log.log(Level.WARNING, "Time \"$time\" is missing an unit")
+            return defaultMs
         }
         if (firstLetterIndex == 0) {
-            log.log(Level.WARNING, "Time \""+time+"\" is missing an amount");
-            return defaultMs;
+            log.log(Level.WARNING, "Time \"$time\" is missing an amount")
+            return defaultMs
         }
-        final long amount;
+        val amount: Long
         try {
-            amount = Long.parseLong(sanitized.substring(0, firstLetterIndex));
-        } catch (NumberFormatException e) {
-            log.log(Level.WARNING, "Time \""+time+"\" is invalid");
-            return defaultMs;
+            amount = sanitized.substring(0, firstLetterIndex).toLong()
+        } catch (e: NumberFormatException) {
+            log.log(Level.WARNING, "Time \"$time\" is invalid")
+            return defaultMs
         }
-
-        final TimeUnit unit;
-        switch (sanitized.charAt(firstLetterIndex)) {
-            case 's':
-                unit = TimeUnit.SECONDS;
-                break;
-            case 'm':
-                unit = TimeUnit.MINUTES;
-                break;
-            case 'h':
-                unit = TimeUnit.HOURS;
-                break;
-            case 'd':
-                unit = TimeUnit.DAYS;
-                break;
-            default:
-                log.log(Level.WARNING, "Time \""+time+"\" has invalid unit");
-                return defaultMs;
+        val unit = when (sanitized[firstLetterIndex]) {
+            's' -> TimeUnit.SECONDS
+            'm' -> TimeUnit.MINUTES
+            'h' -> TimeUnit.HOURS
+            'd' -> TimeUnit.DAYS
+            else -> {
+                log.log(Level.WARNING, "Time \"$time\" has invalid unit")
+                return defaultMs
+            }
         }
-
-        return unit.toMillis(amount);
+        return unit.toMillis(amount)
     }
 
-    @NotNull
-    public static String normalizeKey(@Nullable String sound) {
+    @JvmStatic
+    fun normalizeKey(sound: String?): String {
         if (sound == null) {
-            return "";
+            return ""
         }
-        return sound.replaceAll("[^_./:0-9A-Za-z-]+", "").toLowerCase();
+        return sound.replace("[^_./:0-9A-Za-z-]+".toRegex(), "").lowercase(Locale.getDefault())
     }
 
-    @NotNull
-    public static Color parseColor(@Nullable String color, @NotNull Color defaultColor, @NotNull Logger log) {
+    @JvmStatic
+    fun parseColor(color: String?, defaultColor: Color, log: Logger): Color {
         if (color == null) {
-            return defaultColor;
+            return defaultColor
         }
-        final String colorHex = color.replaceAll("[^0-9A-Fa-f]+", "");
-        if (colorHex.length() != 6) {
-            log.log(Level.WARNING, "Invalid color: '"+color+"' - must be hexadecimal number in RRGGBB format");
-            return defaultColor;
+        val colorHex = color.replace("[^0-9A-Fa-f]+".toRegex(), "")
+        if (colorHex.length != 6) {
+            log.log(
+                Level.WARNING,
+                "Invalid color: '$color' - must be hexadecimal number in RRGGBB format"
+            )
+            return defaultColor
         }
         try {
-            return Color.fromRGB(Integer.parseInt(color, 16) & 0xFF_FF_FF);
-        } catch (NumberFormatException nfe) {
-            log.log(Level.WARNING, "Invalid color: '"+color+"' - must be hexadecimal number in RRGGBB format");
-            return defaultColor;
+            return Color.fromRGB(color.toInt(16) and 0xFFFFFF)
+        } catch (nfe: NumberFormatException) {
+            log.log(
+                Level.WARNING,
+                "Invalid color: '$color' - must be hexadecimal number in RRGGBB format"
+            )
+            return defaultColor
         }
     }
 
     // https://stackoverflow.com/a/2633161
-    public static long saturatedAdd(long x, long y) {
+    @JvmStatic
+    fun saturatedAdd(x: Long, y: Long): Long {
         // Sum ignoring overflow/underflow
-        long s = x + y;
+        val s = x + y
 
         // Long.MIN_VALUE if result positive (potential underflow)
         // Long.MAX_VALUE if result negative (potential overflow)
-        long limit = Long.MIN_VALUE ^ (s >> 63);
+        val limit = Long.MIN_VALUE xor (s shr 63)
 
         // -1 if overflow/underflow occurred, 0 otherwise
-        long overflow = ((x ^ s) & ~(x ^ y)) >> 63;
+        val overflow = ((x xor s) and (x xor y).inv()) shr 63
 
         // limit if overflowed/underflowed, else s
-        return ((limit ^ s) & overflow) ^ s;
+        return ((limit xor s) and overflow) xor s
     }
 
-    public static int clamp(int value, int min, int max) {
-        return Math.max(min, Math.min(value, max));
+    @JvmStatic
+    fun clamp(value: Int, min: Int, max: Int): Int {
+        return max(min.toDouble(), min(value.toDouble(), max.toDouble())).toInt()
     }
 
-    public static int getExpToLevel(int expLevel) {
+    @JvmStatic
+    fun getExpToLevel(expLevel: Int): Int {
         // From Spigot source
-        if (expLevel >= 30) return 112 + (expLevel - 30) * 9;
-        else if (expLevel >= 15) return 37 + (expLevel - 15) * 5;
-        else return 7 + expLevel * 2;
-    }
-
-    public static int getExperienceToReach(int level) {
-        // From https://minecraft.gamepedia.com/Experience (16. 7. 2019, Minecraft 1.14.2)
-        final int level2 = level * level;
-        if (level <= 16) {
-            return level2 + 6*level;
-        } else if (level <= 31) {
-            return level2 * 2 + level2/2 - 40*level - level/2 + 360;
+        return if (expLevel >= 30) {
+            112 + (expLevel - 30) * 9
+        } else if (expLevel >= 15) {
+            37 + (expLevel - 15) * 5
         } else {
-            return level2 * 4 + level2/2 - 162 * level - level/2 + 2220;
+            7 + expLevel * 2
         }
     }
 
-    public static int getTotalExperience(@NotNull Player player) {
+    @JvmStatic
+    fun getExperienceToReach(level: Int): Int {
+        // From https://minecraft.gamepedia.com/Experience (16. 7. 2019, Minecraft 1.14.2)
+        val level2 = level * level
+        return if (level <= 16) {
+            level2 + 6 * level
+        } else if (level <= 31) {
+            level2 * 2 + level2 / 2 - 40 * level - level / 2 + 360
+        } else {
+            level2 * 4 + level2 / 2 - 162 * level - level / 2 + 2220
+        }
+    }
+
+    @JvmStatic
+    fun getTotalExperience(player: Player): Int {
         // Can't use player.getTotalExperience(), because that does not properly handle XP added via "/xp add level",
         // and, most importantly, it does not factor in experience spent on enchanting.
-        return getExperienceToReach(player.getLevel()) + Math.round(getExpToLevel(player.getLevel()) * player.getExp());
+        return getExperienceToReach(player.level) + Math.round(getExpToLevel(player.level) * player.exp)
     }
 
-    public static String safeToString(ItemStack item) {
+    @JvmStatic
+    fun safeToString(item: ItemStack?): String {
         if (item == null) {
-            return "null";
+            return "null"
         }
-        try {
-            return item.toString();
-        } catch (Exception e) {
-            return "ItemStack{" + item.getType().name() + " x " + item.getAmount() + ", [broken meta]}";
+        return try {
+            item.toString()
+        } catch (e: Exception) {
+            "ItemStack{" + item.type.name + " x " + item.amount + ", [broken meta]}"
         }
     }
 
-    public static Pattern compileSimpleGlob(String glob) {
-        final StringBuilder pattern = new StringBuilder();
-        int begin = 0;
-        while (begin < glob.length()) {
-            final int end = glob.indexOf('*', begin);
+    @JvmStatic
+    fun compileSimpleGlob(glob: String): Pattern {
+        val pattern = StringBuilder()
+        var begin = 0
+        while (begin < glob.length) {
+            val end = glob.indexOf('*', begin)
 
             if (end == -1) {
-                pattern.append(Pattern.quote(glob.substring(begin)));
-                break;
+                pattern.append(Pattern.quote(glob.substring(begin)))
+                break
             } else {
-                pattern.append(Pattern.quote(glob.substring(begin, end)));
-                pattern.append(".*");
+                pattern.append(Pattern.quote(glob.substring(begin, end)))
+                pattern.append(".*")
             }
-            begin = end + 1;
+            begin = end + 1
         }
 
-        return Pattern.compile(pattern.toString());
+        return Pattern.compile(pattern.toString())
     }
 }
