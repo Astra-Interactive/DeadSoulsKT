@@ -6,6 +6,7 @@ import com.darkyen.minecraft.utils.channels.ByteBufferChannel;
 import com.darkyen.minecraft.utils.channels.DataInputChannel;
 import com.darkyen.minecraft.utils.channels.DataOutputChannel;
 import com.darkyen.minecraft.utils.serialization.Serialization;
+import io.papermc.paper.ServerBuildInfo;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,16 +24,23 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.junit.After;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.stubbing.Answer;
 
 
@@ -101,7 +109,13 @@ public final class SoulDatabaseTest {
 
     @Before
     public void setup() {
-        Bukkit.setServer(createMockServer());
+        ServerBuildInfo serverBuildInfo = mock(ServerBuildInfo.class);
+
+        try (MockedStatic<ServerBuildInfo> mockedStatic = mockStatic(ServerBuildInfo.class)) {
+            mockedStatic.when(ServerBuildInfo::buildInfo).thenReturn(serverBuildInfo);
+            assertEquals(ServerBuildInfo.buildInfo(), serverBuildInfo);
+            Bukkit.setServer(createMockServer());
+        }
     }
 
     @After
