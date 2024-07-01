@@ -20,7 +20,7 @@ dependencies {
     testImplementation(libs.bundles.testing.kotlin)
     testImplementation(libs.tests.kotlin.test)
     testImplementation(libs.minecraft.paper.api)
-    testImplementation("com.github.MockBukkit:MockBukkit:v3.90.0")
+    testImplementation("com.github.MockBukkit:MockBukkit:v3.92.1")
     testImplementation("org.mockito:mockito-core:5.12.0")
     // Spigot dependencies
     compileOnly(libs.minecraft.paper.api)
