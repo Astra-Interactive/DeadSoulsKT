@@ -12,7 +12,7 @@ driver-mysql = "8.0.33"
 # Minecraft
 minecraft-version = "1.19.2"
 minecraft-velocity = "3.1.1"
-minecraft-spigot = "1.20.6-R0.1-SNAPSHOT"
+minecraft-spigot = "1.21-R0.1-SNAPSHOT"
 minecraft-papi = "2.11.6"
 minecraft-protocollib = "5.1.0"
 minecraft-wg = "7.0.7"
@@ -20,7 +20,7 @@ minecraft-vault = "1.7.1"
 minecraft-coreprotect = "21.2"
 minecraft-astralibs = "2.28.0"
 minecraft-bstats = "3.0.2"
-minecraft-mockbukkit = "3.93.0"
+minecraft-mockbukkit = "v3.93.2"
 
 # Testing
 tests-org-testing = "7.1.0"
