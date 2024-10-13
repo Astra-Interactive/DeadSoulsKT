@@ -29,7 +29,7 @@ dependencies {
     implementation(project(":api"))
 }
 
-val destination = File("D:\\Minecraft Servers\\Servers\\esmp-configuration\\test\\plugins")
+val destination = File("/media/makeevrserg/WDGOLD2TB/Minecraft Servers/Servers/conf.smp/smp/plugins")
     .takeIf(File::exists)
     ?: File(rootDir, "jars")
 

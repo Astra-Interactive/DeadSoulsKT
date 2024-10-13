@@ -39,7 +39,7 @@ import static com.darkyen.minecraft.utils.Util.*;
 /**
  *
  */
-public abstract class DeadSouls extends JavaPlugin {
+public final class DeadSouls extends JavaPlugin {
     // Need for MockBukkit testing
     public DeadSouls() {
         super();
