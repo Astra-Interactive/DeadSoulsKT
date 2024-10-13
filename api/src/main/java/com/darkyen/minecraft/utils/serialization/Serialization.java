@@ -65,19 +65,7 @@ public final class Serialization {
             for (Object listItem : list) {
                 serializeObject(listItem, out);
             }
-        } else if (object instanceof Set) {
-            final Set set = (Set) object;
-            if (set.size() <= 0xFF) {
-                out.writeByte(SerializedType.SET_BYTE.ordinal());
-                out.writeByte(set.size());
-            } else {
-                out.writeByte(SerializedType.SET.ordinal());
-                out.writeInt(set.size());
-            }
-            for (Object listItem : set) {
-                serializeObject(listItem, out);
-            }
-        } else if (object instanceof Map) {
+        }else if (object instanceof Map) {
             final Map<?, ?> map = (Map) object;
             if (map.size() <= 0xFF) {
                 out.writeByte(SerializedType.MAP_BYTE.ordinal());
@@ -147,17 +135,6 @@ public final class Serialization {
                 if (length == 0)
                     return Collections.emptyList();
                 final ArrayList<Object> list = new ArrayList<>(length);
-                for (int i = 0; i < length; i++) {
-                    list.add(deserializeObject(in));
-                }
-                return list;
-            }
-            case SET_BYTE:
-            case SET: {
-                final int length = type == SerializedType.SET_BYTE ? in.readUnsignedByte() : in.readInt();
-                if (length == 0)
-                    return Collections.emptySet();
-                final HashSet<Object> list = new HashSet<>(length);
                 for (int i = 0; i < length; i++) {
                     list.add(deserializeObject(in));
                 }
