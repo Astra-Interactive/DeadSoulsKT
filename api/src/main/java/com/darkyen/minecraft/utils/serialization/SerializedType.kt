@@ -16,6 +16,8 @@ enum class SerializedType {
     /** List with a small number of entries whose amount fit into a byte.  */
     LIST_BYTE,
     LIST,
+    SET_BYTE,
+    SET,
 
     /** Map with a small number of entries whose amount fit into a byte.  */
     MAP_BYTE,

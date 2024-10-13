@@ -5,6 +5,7 @@ import com.darkyen.minecraft.utils.channels.DataInputChannel;
 import com.darkyen.minecraft.utils.channels.DataOutputChannel;
 import com.darkyen.minecraft.utils.serialization.Serialization;
 import com.darkyen.minecraft.utils.serialization.SerializedType;
+import java.util.HashSet;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -309,6 +310,8 @@ public final class DataChannelTest {
                 return false;
             case LIST_BYTE:
             case LIST:
+            case SET_BYTE:
+            case SET:
             case MAP_BYTE:
             case MAP:
             case CONFIGURATION_SERIALIZABLE_BYTE:
@@ -365,6 +368,15 @@ public final class DataChannelTest {
                     resultList.add(generateObject(branchChance * 0.3f));
                 }
                 return resultList;
+            }
+            case SET_BYTE:
+            case SET: {
+                final int length = type == SET_BYTE ? random.nextInt(256) : 256 + random.nextInt(10);
+                final HashSet<Object> resultSet = new HashSet<>(length);
+                for (int i = 0; i < length; i++) {
+                    resultSet.add(generateObject(branchChance * 0.3f));
+                }
+                return resultSet;
             }
             case MAP_BYTE:
             case MAP: {

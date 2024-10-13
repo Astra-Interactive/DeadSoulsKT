@@ -1,5 +1,7 @@
 package com.darkyen.minecraft;
 
+import be.seeseemelk.mockbukkit.MockBukkit;
+import be.seeseemelk.mockbukkit.ServerMock;
 import com.darkyen.minecraft.database.SoulDatabase;
 import com.darkyen.minecraft.models.Soul;
 import com.darkyen.minecraft.utils.channels.ByteBufferChannel;
@@ -48,13 +50,11 @@ import org.mockito.stubbing.Answer;
  *
  */
 public final class SoulDatabaseTest {
-    //	private static ServerMock server;
-    private static DeadSouls plugin;
 
     UnsafeValues createMockUnsafeValues() {
         UnsafeValues unsafeValues = mock(UnsafeValues.class);
         when(unsafeValues.getDataVersion()).thenReturn(1234);
-        when(unsafeValues.getFeatureFlag(any())).thenReturn(null);
+//        when(unsafeValues.getFeatureFlag(any())).thenReturn(null);
         when(unsafeValues.isSupportedApiVersion(anyString())).thenReturn(false);
         when(unsafeValues.getMaterial(any(), anyInt())).thenAnswer(
                 (Answer) invocation -> {
@@ -107,7 +107,7 @@ public final class SoulDatabaseTest {
         return server;
     }
 
-    @Before
+    //    @Before
     public void setup() {
         ServerBuildInfo serverBuildInfo = mock(ServerBuildInfo.class);
 
@@ -118,8 +118,19 @@ public final class SoulDatabaseTest {
         }
     }
 
+    private ServerMock server;
+
+    private DeadSouls plugin;
+
+    @Before
+    public void setUp() {
+        this.server = MockBukkit.mock();
+        this.plugin = MockBukkit.load(DeadSouls.class);
+    }
+
     @After
     public void tearDown() {
+        MockBukkit.unmock();
     }
 
     @Test
