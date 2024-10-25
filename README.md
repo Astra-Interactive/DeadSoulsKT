@@ -1,3 +1,10 @@
+
+
+# [DISCONTINUED into SoulKeeper](https://github.com/Astra-Interactive/SoulKeeper)
+This plugin was great, but it has some bugs, which is hard to catch and fix. Moreover, it's hard to edit and refactor it into multiplatform architecture.
+
+I've decided to rewrite it into new and more-featured plugin [SoulKeeper](https://github.com/Astra-Interactive/SoulKeeper). It will have all the original features plus even more.
+
 # DeadSouls
 
 We've been using [DeadSouls](https://github.com/Darkyenus/DeadSouls) on [EmpireProjekt](https://empireprojekt.ru/) for a very long time and we wan to make this plugin even better! Or at least keep it alive.
